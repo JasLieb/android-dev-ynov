@@ -5,12 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SecondScreen">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="It should be hidden by a Message box !"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="It should be hidden by a Message box !"
+            />
+
+        <EditText
+            android:id="@+id/urlWritten"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Write your URL here"
+            android:padding="25dp"
+            />
+
+        <Button
+            android:id="@+id/openURL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Take-off to the web"
+            android:padding="25dp"
+            />
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

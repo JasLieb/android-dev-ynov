@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">FirstFruitAndroid</string>
     <string name="title_activity_second_screen">SecondScreen</string>
-    <string name="fichier_messExport">messyExport</string>
+    <string name="maybeDangerous">Internet can be dangerous alone, take his warn with you !</string>
+    <string name="notAURL">No valid URL provided</string>
+    <string name="warning">Warning !</string>
 </resources>

@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
             ONSTARTMESSAGE = "OnStart()",
             ONDESTROYMESSAGE = "OnDestroy ()";
 
-    private MainActivity currentActivity = this;
     private int clickCount;
 
     @Override
@@ -39,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
         nextActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(currentActivity, SecondScreen.class);
-                startActivity(intent);
+                startSecondActivity();
             }
         });
 
@@ -52,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
                 updateTextView();
             }
         });
+    }
+
+    private void startSecondActivity() {
+        Intent intent = new Intent(this, SecondScreen.class);
+        startActivity(intent);
     }
 
     private int getSavedCountFrom(Bundle instance) {

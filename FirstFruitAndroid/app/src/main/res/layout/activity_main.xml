@@ -15,27 +15,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="10dp"
             >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Label"
                 android:layout_weight="0.25"
+                android:text="Your's name :"
                 />
 
             <EditText
+                android:id="@+id/userName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
-                android:layout_weight="4"
+                android:layout_weight="5"
                 />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            >
 
             <Button
                 android:id="@+id/incrementCounter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="click"
-                android:layout_weight="0.75"
+                android:layout_marginHorizontal="10dp"
+                android:text="click me"
+                android:layout_weight="0.25"
                 />
 
             <TextView
@@ -44,17 +56,43 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Hello World!"
-                android:layout_weight="1"
+                android:layout_weight="0.75"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="25dp"
+            >
+
+            <Button
+                android:id="@+id/goToNextActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Go to next Activity"
                 />
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/goToNextActivity"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
             android:layout_marginTop="25dp"
-            android:text="Go to next Activity"
-            />
+            >
+
+            <Button
+                android:id="@+id/goToLoginActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                />
+
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

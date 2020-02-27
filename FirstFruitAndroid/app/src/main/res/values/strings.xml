@@ -4,4 +4,15 @@
     <string name="maybeDangerous">Internet can be dangerous alone, take his warn with you !</string>
     <string name="notAURL">No valid URL provided</string>
     <string name="warning">Warning !</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="isNotLogged">"You aren't logged "</string>
+    <string name="isLogged">"You are logged "</string>
 </resources>

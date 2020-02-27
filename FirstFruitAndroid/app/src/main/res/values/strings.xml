@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FirstFruitAndroid</string>
+    <string name="title_activity_second_screen">SecondScreen</string>
+    <string name="fichier_messExport">messyExport</string>
 </resources>

@@ -16,22 +16,26 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Label"
+                android:layout_weight="0.25"
+                />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
-                android:layout_weight="1"
-                android:minLines="3"
+                android:layout_weight="4"
                 />
 
             <Button
+                android:id="@+id/incrementCounter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="click me"
-                android:id="@+id/helloBtn"
-                android:onClick="onClickCounter"
-                android:layout_weight="0.25"
+                android:text="click"
+                android:layout_weight="0.75"
                 />
 
             <TextView
@@ -44,5 +48,13 @@
                 />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/goToNextActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="Go to next Activity"
+            />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

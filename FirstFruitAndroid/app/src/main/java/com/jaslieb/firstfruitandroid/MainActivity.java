@@ -2,9 +2,11 @@ package com.jaslieb.firstfruitandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
             ONSTARTMESSAGE = "OnStart()",
             ONDESTROYMESSAGE = "OnDestroy ()";
 
+    private MainActivity currentActivity = this;
     private int clickCount;
 
     @Override
@@ -30,11 +33,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(savedInstanceState != null) {
-            clickCount = savedInstanceState.getInt(COUNTERKEY, 0);
-        } else {
-            clickCount = 0;
-        }
+        clickCount = getSavedCountFrom(savedInstanceState);
+
+        Button nextActivityButton = findViewById(R.id.goToNextActivity);
+        nextActivityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(currentActivity, SecondScreen.class);
+                startActivity(intent);
+            }
+        });
+
+        Button incrementCounterBtn = findViewById(R.id.incrementCounter);
+        incrementCounterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                incrementCounter();
+                updateTextView();
+            }
+        });
+    }
+
+    private int getSavedCountFrom(Bundle instance) {
+        return instance != null
+                ? instance.getInt(COUNTERKEY)
+                : 0;
     }
 
     @Override
@@ -68,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    public void onClickCounter(View v) {
-        Log.d(TAG, "Counter button clicked : +1" );
-        incrementCounter();
+    private void updateTextView() {
         TextView textView = findViewById(R.id.helloText);
         textView.setText(getCounterString());
     }

@@ -31,18 +31,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"/>
         <Button
+            android:id="@+id/alphaOrderBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Click me"
+            android:text="Alphabetical order"
             android:layout_marginLeft="20dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <Button
+            android:id="@+id/invertOrderBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Not me"
+            android:text="Inverted order"
             android:layout_marginRight="20dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

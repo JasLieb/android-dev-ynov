@@ -57,8 +57,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
+                android:layout_marginBottom="50dp"
                 android:minWidth="200dp"
                 android:minHeight="200dp"
+                />
+
+            <Button
+                android:id="@+id/sendWeatherBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="Send weather to a friend"
                 />
         </FrameLayout>
     </LinearLayout>

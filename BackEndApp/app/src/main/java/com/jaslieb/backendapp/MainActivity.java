@@ -1,9 +1,14 @@
 package com.jaslieb.backendapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -27,6 +32,10 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     private static final int SHORT_DURATION_ANIMATION = 500;
+    private static final int PERMISSIONS_REQUEST_SEND_SMS = 0;
+
+    private String weatherString;
+
     private EditText townNameEdt;
     private FrameLayout resultFrame;
     private TextView weatherResultTxt;
@@ -54,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String townName = townNameEdt.getText().toString();
 
-
                 if(townName.length() > 0) {
                     hideKeyboard();
                     getWeatherFor(townName);
@@ -63,6 +71,66 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Button sendWeatherBtn = findViewById(R.id.sendWeatherBtn);
+        sendWeatherBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendSMS();
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_SEND_SMS: {
+                // If request is cancelled, the result arrays are empty.
+                if (
+                        grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    sendSMS();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
+
+
+    private void sendSMS() {
+        if (
+                ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.SEND_SMS
+                )
+                != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            // Permission is not granted
+            if (
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.SEND_SMS
+                    )
+            ) { } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                            new String[]{Manifest.permission.SEND_SMS
+                        },
+                        PERMISSIONS_REQUEST_SEND_SMS
+                );
+            }
+        } else {
+            // Permission has already been granted
+            SmsManager manager = SmsManager.getDefault();
+            manager.sendTextMessage("0609580401", null, weatherString, null, null);
+        }
+
     }
 
     private void hideKeyboard() {
@@ -78,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void getWeatherFor(String town) {
+    private void getWeatherFor(final String town) {
         String url ="https://www.prevision-meteo.ch/services/json/" + town.toLowerCase();
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -96,7 +164,10 @@ public class MainActivity extends AppCompatActivity {
                                 icon = currentCondition.getString("icon");
 
                         Picasso.get().load(icon).into(weatherIcon);
-                        weatherResultTxt.setText(String.format("%s - %s °C", weather, temperature));
+
+                        weatherString = String.format("%s : %s - %s °C", town.toUpperCase(), weather, temperature);
+                        weatherResultTxt.setText(weatherString);
+
                         crossFadeResult();
                     } catch (JSONException e) {
                         e.printStackTrace();

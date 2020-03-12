@@ -42,17 +42,21 @@ public class MainActivity extends AppCompatActivity {
 
     private String weatherString;
     private String phoneNo;
+
     private EditText townNameEdt;
     private FrameLayout resultFrame;
     private TextView weatherResultTxt;
     private ImageView weatherIcon;
 
     private RequestQueue queue;
+    private DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        db = new DBHelper(this);
 
         townNameEdt = findViewById(R.id.townNameEdt);
         resultFrame = findViewById(R.id.resultFrame);
@@ -62,6 +66,14 @@ public class MainActivity extends AppCompatActivity {
         weatherIcon = findViewById(R.id.weatherIconImg);
 
         queue = Volley.newRequestQueue(this);
+
+        Button weatherHistoryBtn = findViewById(R.id.weatherHistoryBtn);
+        weatherHistoryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startHisotryActivity();
+            }
+        });
 
         Button townWeatherBtn = findViewById(R.id.weatherTownBtn);
         townWeatherBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(contactPickerIntent, RESULT_PICK_CONTACT);
             }
         });
+    }
+
+    private void startHisotryActivity() {
+        Intent intent = new Intent(this, WeatherHistoryActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -204,8 +221,10 @@ public class MainActivity extends AppCompatActivity {
                         Picasso.get().load(icon).into(weatherIcon);
 
                         weatherString = String.format("%s : %s - %s °C", town.toUpperCase(), weather, temperature);
-                        weatherResultTxt.setText(weatherString);
 
+                        db.insertData(town.toUpperCase(), String.format("%s - %s", weather, temperature));
+
+                        weatherResultTxt.setText(weatherString);
                         crossFadeResult();
                     } catch (JSONException e) {
                         e.printStackTrace();

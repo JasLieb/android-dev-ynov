@@ -6,9 +6,14 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -33,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SHORT_DURATION_ANIMATION = 500;
     private static final int PERMISSIONS_REQUEST_SEND_SMS = 0;
+    private static final int RESULT_PICK_CONTACT = 1;
 
     private String weatherString;
-
+    private String phoneNo;
     private EditText townNameEdt;
     private FrameLayout resultFrame;
     private TextView weatherResultTxt;
@@ -76,14 +82,44 @@ public class MainActivity extends AppCompatActivity {
         sendWeatherBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendSMS();
+                Intent contactPickerIntent =
+                    new Intent(
+                            Intent.ACTION_PICK,
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+                    );
+                startActivityForResult(contactPickerIntent, RESULT_PICK_CONTACT);
             }
         });
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case RESULT_PICK_CONTACT:
+                    try {
+                        Cursor cursor = null;
+                        Uri uri = data.getData();
+                        cursor = getContentResolver().query(uri, null, null, null, null);
+                        cursor.moveToFirst();
+                        phoneNo = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        if(checkSendSMSPermission()){
+                            sendSMS();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        } else {
+            Log.e("MainActivity", "Failed to pick contact");
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case PERMISSIONS_REQUEST_SEND_SMS: {
                 // If request is cancelled, the result arrays are empty.
@@ -96,41 +132,43 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
 
-    private void sendSMS() {
+    private boolean checkSendSMSPermission() {
         if (
-                ContextCompat.checkSelfPermission(
+            ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.SEND_SMS
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+           return true;
+        }
+
+        if (
+                ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
                         Manifest.permission.SEND_SMS
                 )
-                != PackageManager.PERMISSION_GRANTED
         ) {
-
-            // Permission is not granted
-            if (
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
+            ActivityCompat.requestPermissions(
+                    this,
+                        new String[]{
                             Manifest.permission.SEND_SMS
-                    )
-            ) { } else {
-                ActivityCompat.requestPermissions(
-                        this,
-                            new String[]{Manifest.permission.SEND_SMS
-                        },
-                        PERMISSIONS_REQUEST_SEND_SMS
-                );
-            }
+                    },
+                    PERMISSIONS_REQUEST_SEND_SMS
+            );
         } else {
-            // Permission has already been granted
-            SmsManager manager = SmsManager.getDefault();
-            manager.sendTextMessage("0609580401", null, weatherString, null, null);
+            // ShutDown App here or go to preferences > this app > permissions
         }
+        return false;
+    }
 
+    private void sendSMS() {
+        SmsManager manager = SmsManager.getDefault();
+        manager.sendTextMessage(phoneNo, null, weatherString, null, null);
     }
 
     private void hideKeyboard() {

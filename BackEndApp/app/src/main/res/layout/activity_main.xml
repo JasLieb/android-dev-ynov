@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,6 +14,7 @@
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        android:animateLayoutChanges="true"
         >
         <TextView
             android:layout_width="wrap_content"
@@ -26,6 +28,7 @@
             android:layout_height="wrap_content"
             android:minWidth="250dp"
             android:layout_margin="25dp"
+            android:gravity="center"
             />
 
         <Button
@@ -35,21 +38,29 @@
             android:text="See your town's weather"
             />
 
-        <ImageView
-            android:id="@+id/weatherIconImg"
+        <FrameLayout
+            android:id="@+id/resultFrame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="25dp"
-            android:minWidth="250dp"
-            android:minHeight="250dp"
-            />
+            android:layout_gravity="center"
+            >
+            <TextView
+                android:id="@+id/weatherResultTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                />
 
-        <TextView
-            android:id="@+id/weatherResultTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            />
+            <ImageView
+                android:id="@+id/weatherIconImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:minWidth="200dp"
+                android:minHeight="200dp"
+                />
+        </FrameLayout>
     </LinearLayout>
 
 

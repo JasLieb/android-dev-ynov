@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,7 +26,9 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int SHORT_DURATION_ANIMATION = 500;
     private EditText townNameEdt;
+    private FrameLayout resultFrame;
     private TextView weatherResultTxt;
     private ImageView weatherIcon;
 
@@ -36,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         townNameEdt = findViewById(R.id.townNameEdt);
+        resultFrame = findViewById(R.id.resultFrame);
+        resultFrame.setVisibility(View.GONE);
+
         weatherResultTxt = findViewById(R.id.weatherResultTxt);
         weatherIcon = findViewById(R.id.weatherIconImg);
 
@@ -45,14 +52,30 @@ public class MainActivity extends AppCompatActivity {
         townWeatherBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InputMethodManager inputManager = (InputMethodManager)
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                String townName = townNameEdt.getText().toString();
 
-                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
-                getWeatherFor(townNameEdt.getText().toString());
+
+                if(townName.length() > 0) {
+                    hideKeyboard();
+                    getWeatherFor(townName);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please give a town name", Toast.LENGTH_LONG).show();
+                }
             }
         });
+    }
+
+    private void hideKeyboard() {
+        try {
+
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(
+                    getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void getWeatherFor(String town) {
@@ -74,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
                         Picasso.get().load(icon).into(weatherIcon);
                         weatherResultTxt.setText(String.format("%s - %s °C", weather, temperature));
+                        crossFadeResult();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -88,5 +112,14 @@ public class MainActivity extends AppCompatActivity {
         );
 
         queue.add(stringRequest);
+    }
+
+    private void crossFadeResult() {
+        resultFrame.setAlpha(0f);
+        resultFrame.setVisibility(View.VISIBLE);
+
+        resultFrame.animate()
+                .alpha(1f)
+                .setDuration(SHORT_DURATION_ANIMATION);
     }
 }

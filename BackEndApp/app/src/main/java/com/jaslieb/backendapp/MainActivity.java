@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (
-                ActivityCompat.shouldShowRequestPermissionRationale(
+                !ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
                         Manifest.permission.SEND_SMS
                 )

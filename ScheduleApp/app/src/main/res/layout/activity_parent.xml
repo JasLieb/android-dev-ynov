@@ -60,11 +60,14 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="25dp"
                     android:layout_gravity="center">
-                    <NumberPicker
-                        android:id="@+id/npTimeValue"
+
+                    <EditText
+                        android:id="@+id/etTimeValue"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:layout_weight="1"
+                        android:gravity="center"
+                        android:inputType="number"
                         />
 
                     <Spinner

@@ -3,6 +3,8 @@ package com.jaslieb.scheduleapp.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,9 +28,12 @@ public class ParentActivity extends AppCompatActivity {
 
     private Button btAddTasks;
     private EditText etTaskName;
+    private EditText etTimeValue;
     private Spinner spTimeUnit;
     private NumberPicker npTimeValue;
 
+    /// TODO move to state
+    private int max;
     private ParentState state;
     private ParentService service;
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -54,7 +59,19 @@ public class ParentActivity extends AppCompatActivity {
 
         etTaskName = findViewById(R.id.etTaskName);
 
-        npTimeValue = findViewById(R.id.npTimeValue);
+        etTimeValue = findViewById(R.id.etTimeValue);
+        etTimeValue.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            public void afterTextChanged(Editable s) {
+                checkTimeValue();
+            }
+        });
 
         spTimeUnit = findViewById(R.id.spTimeUnit);
         spTimeUnit.setAdapter(
@@ -66,7 +83,9 @@ public class ParentActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 for(TimeUnitEnum unit: TimeUnitEnum.values()) {
                     if(unit.position == position){
-                        setNpTimeValueMax(unit.max);
+                        max = unit.max;
+                        etTimeValue.setHint(formatMaxValue(max));
+                        checkTimeValue();
                     }
                 }
             }
@@ -91,6 +110,12 @@ public class ParentActivity extends AppCompatActivity {
         disposable.add(childStateObserver);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.dispose();
+    }
+
     private ArrayAdapter<String> getTimeUnitAdapter() {
         ArrayList<String> timeUnits = new ArrayList<>();
         for(TimeUnitEnum unit: TimeUnitEnum.values()) {
@@ -100,14 +125,19 @@ public class ParentActivity extends AppCompatActivity {
         return new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, timeUnits);
     }
 
-    private void setNpTimeValueMax(int max) {
-        npTimeValue.setMinValue(1);
-        npTimeValue.setMaxValue(max);
+    private void checkTimeValue() {
+        String value = etTimeValue.getText().toString();
+        if(
+            !value.isEmpty() &&
+            Integer.parseInt(value) > max
+        ) {
+            etTimeValue.setError(
+                String.format("Maximum allowed : %d", max)
+            );
+        }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposable.dispose();
+    private String formatMaxValue(int max) {
+        return String.format("Max : %d", max);
     }
 }

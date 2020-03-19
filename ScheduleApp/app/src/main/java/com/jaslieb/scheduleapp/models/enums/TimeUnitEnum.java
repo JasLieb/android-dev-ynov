@@ -3,6 +3,9 @@ package com.jaslieb.scheduleapp.models.enums;
 import androidx.annotation.NonNull;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public enum TimeUnitEnum {
     SECONDS(ChronoUnit.SECONDS,0, 59),
@@ -37,8 +40,25 @@ public enum TimeUnitEnum {
         return unit.name();
     }
 
+    public static List<TimeUnitEnum> values = Arrays.asList(TimeUnitEnum.values());
+    public static List<TimeUnitEnum> invertedValues =
+            Arrays
+                .stream(TimeUnitEnum.values())
+                .sorted((o1, o2) -> o2.position - o1.position)
+                .collect(Collectors.toList());
+
+    public static String fromMilliseconds(long milli) {
+        for(TimeUnitEnum type: invertedValues) {
+            long divider = type.toMilliseconds(1);
+            if( milli % divider == 0){
+                return Math.floor(milli/divider) + "\n " +  type.toString().toLowerCase();
+            }
+        }
+        throw new Error();
+    }
+
     public static TimeUnitEnum find(long position) {
-        for(TimeUnitEnum type: TimeUnitEnum.values()) {
+        for(TimeUnitEnum type: values) {
             if(type.position == position){
                 return type;
             }
@@ -47,7 +67,7 @@ public enum TimeUnitEnum {
     }
 
     public static TimeUnitEnum find(String name) {
-        for(TimeUnitEnum type: TimeUnitEnum.values()) {
+        for(TimeUnitEnum type: values) {
             if(type.name() == name){
                 return type;
             }

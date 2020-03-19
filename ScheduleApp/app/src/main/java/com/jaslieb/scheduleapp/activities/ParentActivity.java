@@ -44,18 +44,18 @@ public class ParentActivity extends AppCompatActivity {
     private CompositeDisposable disposable = new CompositeDisposable();
 
     private DisposableObserver<ParentState> childStateObserver =
-            new DisposableObserver<ParentState>() {
-                @Override
-                public void onNext(@NonNull ParentState parentState) {
-                    state = parentState;
-                }
+        new DisposableObserver<ParentState>() {
+            @Override
+            public void onNext(@NonNull ParentState parentState) {
+                state = parentState;
+            }
 
-                @Override
-                public void onError(@NonNull Throwable e) {}
+            @Override
+            public void onError(@NonNull Throwable e) {}
 
-                @Override
-                public void onComplete() {}
-            };
+            @Override
+            public void onComplete() {}
+        };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,35 +106,32 @@ public class ParentActivity extends AppCompatActivity {
         dpDateBegin.setMinDate(System.currentTimeMillis());
 
         btAddTasks = findViewById(R.id.btAddTasks);
-        btAddTasks.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String taskName = etTaskName.getText().toString();
-                long beginTime =
-                    new GregorianCalendar(
-                        dpDateBegin.getYear(),
-                        dpDateBegin.getMonth(),
-                        dpDateBegin.getDayOfMonth(),
-                        tpTaskTimeBegin.getHour(),
-                        tpTaskTimeBegin.getMinute()
-                    )
-                    .getTimeInMillis();
+        btAddTasks.setOnClickListener(v -> {
+            String taskName = etTaskName.getText().toString();
+            long beginTime =
+                new GregorianCalendar(
+                    dpDateBegin.getYear(),
+                    dpDateBegin.getMonth(),
+                    dpDateBegin.getDayOfMonth(),
+                    tpTaskTimeBegin.getHour(),
+                    tpTaskTimeBegin.getMinute()
+                )
+                .getTimeInMillis();
 
-                long duration =
-                    TimeUnitEnum.find(
-                        spTimeUnit
-                            .getSelectedItem()
-                            .toString()
-                    )
-                    .toMilliseconds(
-                        etTimeValue.getText().toString()
-                    );
+            long duration =
+                TimeUnitEnum.find(
+                    spTimeUnit
+                        .getSelectedItem()
+                        .toString()
+                )
+                .toMilliseconds(
+                    etTimeValue.getText().toString()
+                );
 
-                TaskTypeEnum type = TaskTypeEnum.find(spTaskType.getSelectedItemId());
+            TaskTypeEnum type = TaskTypeEnum.find(spTaskType.getSelectedItemId());
 
-                if(taskName.length() > 0) {
-                    service.addTask(taskName, beginTime, duration, type);
-                }
+            if(taskName.length() > 0) {
+                service.addTask(taskName, beginTime, duration, type);
             }
         });
 

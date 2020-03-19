@@ -31,14 +31,16 @@ public class ChildTasksAdapter extends ArrayAdapter<Task> {
         final Task task = getItem(position);
         if (convertView == null) {
             convertView =
-                    LayoutInflater
-                            .from(getContext())
-                            .inflate(R.layout.list_task_row, parent, false);
+                LayoutInflater
+                    .from(getContext())
+                    .inflate(R.layout.list_task_row, parent, false);
         }
         TextView tvTitle = convertView.findViewById(R.id.tvTitle);
-        TextView tvDateBegin = convertView.findViewById(R.id.tvDateBegin);
+        TextView tvTaskDuration = convertView.findViewById(R.id.tvTaskDuration);
+        TextView tvDateBegin = convertView.findViewById(R.id.tvTaskBegin);
 
         tvTitle.setText(task.name);
+        tvTaskDuration.setText(TimeUnitEnum.fromMilliseconds(task.duration));
         tvDateBegin.setText(format(task.begin));
 
         return convertView;

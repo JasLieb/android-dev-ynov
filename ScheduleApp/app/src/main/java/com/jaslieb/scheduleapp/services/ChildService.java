@@ -1,14 +1,12 @@
 package com.jaslieb.scheduleapp.services;
 
-import androidx.annotation.Nullable;
-
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.states.ChildState;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
@@ -22,17 +20,22 @@ public class ChildService {
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         tasks = database.collection("tasks");
-        tasks.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-
-                assert value != null;
-                childStateBehavior.onNext(new ChildState(value.toObjects(Task.class)));
+        tasks.addSnapshotListener((value, e) -> {
+            if (e != null) {
+                return;
             }
+
+            assert value != null;
+            List<Task> taskList = value.toObjects(Task.class);
+
+            childStateBehavior.onNext(
+                new ChildState(
+                    taskList
+                        .stream()
+                        .filter(task -> "JohnId".equals(task.childrenId))
+                        .collect(Collectors.toList())
+                )
+            );
         });
     }
 }

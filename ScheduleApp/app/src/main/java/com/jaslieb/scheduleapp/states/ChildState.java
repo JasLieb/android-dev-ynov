@@ -8,8 +8,8 @@ import java.util.List;
 public class ChildState {
     public List<Task> tasks;
     public ChildState(List<Task> tasks) {
-        this.tasks = tasks;
+         this.tasks = tasks;
     }
 
-    public static ChildState Default = new ChildState(new ArrayList<Task>());
+    public static ChildState Default = new ChildState(new ArrayList<>());
 }

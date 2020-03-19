@@ -8,6 +8,8 @@ public class Task {
 
     public TaskType type;
 
+    public Task() {}
+
     public Task(
             String name,
             String childrenId,

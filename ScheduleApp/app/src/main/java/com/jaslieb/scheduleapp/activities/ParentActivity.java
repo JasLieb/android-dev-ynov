@@ -9,16 +9,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 
 import com.jaslieb.scheduleapp.R;
+import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.services.ParentService;
 import com.jaslieb.scheduleapp.states.ParentState;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -29,11 +32,13 @@ public class ParentActivity extends AppCompatActivity {
     private Button btAddTasks;
     private EditText etTaskName;
     private EditText etTimeValue;
-    private Spinner spTimeUnit;
-    private NumberPicker npTimeValue;
 
-    /// TODO move to state
-    private int max;
+    private Spinner spTaskType;
+    private Spinner spTimeUnit;
+
+    private TimePicker tpTaskTimeBegin;
+    private DatePicker dpDateBegin;
+
     private ParentState state;
     private ParentService service;
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -66,12 +71,17 @@ public class ParentActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            public void afterTextChanged(Editable s) {
-                checkTimeValue();
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkTimeValue(TimeUnitEnum.find(spTimeUnit.getSelectedItem().toString()));
             }
+
+            public void afterTextChanged(Editable s) {}
         });
+
+        spTaskType = findViewById(R.id.spTaskType);
+        spTaskType.setAdapter(
+            getTaskTypeAdapter()
+        );
 
         spTimeUnit = findViewById(R.id.spTimeUnit);
         spTimeUnit.setAdapter(
@@ -81,26 +91,49 @@ public class ParentActivity extends AppCompatActivity {
         spTimeUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                for(TimeUnitEnum unit: TimeUnitEnum.values()) {
-                    if(unit.position == position){
-                        max = unit.max;
-                        etTimeValue.setHint(formatMaxValue(max));
-                        checkTimeValue();
-                    }
-                }
+                TimeUnitEnum timeUnit = TimeUnitEnum.find(position);
+                checkTimeValue(timeUnit);
+                etTimeValue.setHint(formatMaxValue(timeUnit));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        tpTaskTimeBegin = findViewById(R.id.tpTaskTimeBegin);
+
+        dpDateBegin = findViewById(R.id.dpDateBegin);
+        dpDateBegin.setMinDate(System.currentTimeMillis());
+
         btAddTasks = findViewById(R.id.btAddTasks);
         btAddTasks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String taskName = etTaskName.getText().toString();
+                long beginTime =
+                    new GregorianCalendar(
+                        dpDateBegin.getYear(),
+                        dpDateBegin.getMonth(),
+                        dpDateBegin.getDayOfMonth(),
+                        tpTaskTimeBegin.getHour(),
+                        tpTaskTimeBegin.getMinute()
+                    )
+                    .getTimeInMillis();
+
+                long duration =
+                    TimeUnitEnum.find(
+                        spTimeUnit
+                            .getSelectedItem()
+                            .toString()
+                    )
+                    .toMilliseconds(
+                        etTimeValue.getText().toString()
+                    );
+
+                TaskTypeEnum type = TaskTypeEnum.find(spTaskType.getSelectedItemId());
+
                 if(taskName.length() > 0) {
-                    service.addTask(taskName);
+                    service.addTask(taskName, beginTime, duration, type);
                 }
             }
         });
@@ -116,28 +149,45 @@ public class ParentActivity extends AppCompatActivity {
         disposable.dispose();
     }
 
+    private ArrayAdapter<String> getTaskTypeAdapter() {
+        ArrayList<String> taskTypes = new ArrayList<>();
+        for(TaskTypeEnum type: TaskTypeEnum.values()) {
+            taskTypes.add(type.toString());
+        }
+
+        return new ArrayAdapter<>(
+            this,
+            R.layout.support_simple_spinner_dropdown_item,
+            taskTypes
+        );
+    }
+
     private ArrayAdapter<String> getTimeUnitAdapter() {
         ArrayList<String> timeUnits = new ArrayList<>();
         for(TimeUnitEnum unit: TimeUnitEnum.values()) {
             timeUnits.add(unit.toString());
         }
 
-        return new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, timeUnits);
+        return new ArrayAdapter<>(
+            this,
+            R.layout.support_simple_spinner_dropdown_item,
+            timeUnits
+        );
     }
 
-    private void checkTimeValue() {
+    private void checkTimeValue(TimeUnitEnum timeUnit) {
         String value = etTimeValue.getText().toString();
         if(
             !value.isEmpty() &&
-            Integer.parseInt(value) > max
+            Integer.parseInt(value) > timeUnit.max
         ) {
             etTimeValue.setError(
-                String.format("Maximum allowed : %d", max)
+                String.format("Maximum allowed : %d", timeUnit.max)
             );
         }
     }
 
-    private String formatMaxValue(int max) {
-        return String.format("Max : %d", max);
+    private String formatMaxValue(TimeUnitEnum timeUnit) {
+        return String.format("Max : %d", timeUnit.max);
     }
 }

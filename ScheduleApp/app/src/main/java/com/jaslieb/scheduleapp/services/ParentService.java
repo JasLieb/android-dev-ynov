@@ -39,14 +39,14 @@ public class ParentService {
         });
     }
 
-    public void addTask(String name) {
+    public void addTask(String name, long beginTime, long duration, TaskTypeEnum type) {
         tasks.add(
             new Task(
                 name,
                 "JohnId",
-                System.currentTimeMillis(),
-                TimeUnit.MINUTES.toMillis(30),
-                TaskTypeEnum.EVERYDAY_LIFE
+                beginTime,
+                duration,
+                type
             )
         );
     }

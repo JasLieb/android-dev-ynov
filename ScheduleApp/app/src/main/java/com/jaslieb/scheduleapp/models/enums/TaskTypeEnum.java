@@ -1,6 +1,6 @@
-package com.jaslieb.scheduleapp.models;
+package com.jaslieb.scheduleapp.models.enums;
 
-public enum TaskType {
+public enum TaskTypeEnum {
     EVERYDAY_LIFE,
     SCHOOL,
     OUTSIDE_SCHOOL,

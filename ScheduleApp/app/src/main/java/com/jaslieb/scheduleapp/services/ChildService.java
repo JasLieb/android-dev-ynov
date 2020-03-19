@@ -6,15 +6,9 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jaslieb.scheduleapp.models.Task;
-import com.jaslieb.scheduleapp.models.TaskType;
 import com.jaslieb.scheduleapp.states.ChildState;
-
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 

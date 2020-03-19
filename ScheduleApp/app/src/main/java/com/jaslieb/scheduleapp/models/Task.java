@@ -1,12 +1,14 @@
 package com.jaslieb.scheduleapp.models;
 
+import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
+
 public class Task {
     public String name;
     public String childrenId;
     public long begin;
     public long duration;
 
-    public TaskType type;
+    public TaskTypeEnum type;
 
     public Task() {}
 
@@ -15,7 +17,7 @@ public class Task {
             String childrenId,
             long begin,
             long duration,
-            TaskType type
+            TaskTypeEnum type
     ) {
         this.name = name;
         this.childrenId = childrenId;

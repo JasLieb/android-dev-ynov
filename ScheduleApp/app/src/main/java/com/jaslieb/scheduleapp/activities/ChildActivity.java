@@ -25,19 +25,16 @@ public class ChildActivity extends AppCompatActivity {
             new DisposableObserver<ChildState>() {
                 @Override
                 public void onNext(@NonNull ChildState childState) {
+                    tasksAdapter.clear();
                     tasksAdapter.addAll(childState.tasks);
                     taskList.setAdapter(tasksAdapter);
                 }
 
                 @Override
-                public void onError(@NonNull Throwable e) {
-
-                }
+                public void onError(@NonNull Throwable e) {}
 
                 @Override
-                public void onComplete() {
-
-                }
+                public void onComplete() {}
             };
 
     @Override

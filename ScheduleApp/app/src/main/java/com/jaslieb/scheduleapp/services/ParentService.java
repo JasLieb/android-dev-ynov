@@ -11,6 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.TaskType;
 import com.jaslieb.scheduleapp.states.ChildState;
+import com.jaslieb.scheduleapp.states.ParentState;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -18,13 +19,13 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-public class ChildService {
-
+public class ParentService {
     private CollectionReference tasks;
-    public BehaviorSubject<ChildState> childStateBehavior;
 
-    public ChildService() {
-        childStateBehavior = BehaviorSubject.createDefault(ChildState.Default);
+    public BehaviorSubject<ParentState> parentStateBehavior;
+
+    public  ParentService() {
+        parentStateBehavior = BehaviorSubject.createDefault(ParentState.Default);
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         tasks = database.collection("tasks");
@@ -37,8 +38,20 @@ public class ChildService {
                 }
 
                 assert value != null;
-                childStateBehavior.onNext(new ChildState(value.toObjects(Task.class)));
+                parentStateBehavior.onNext(new ParentState(value.toObjects(Task.class)));
             }
         });
+    }
+
+    public void addTask(String name) {
+        tasks.add(
+            new Task(
+                name,
+                "JohnId",
+                System.currentTimeMillis(),
+                TimeUnit.MINUTES.toMillis(30),
+                TaskType.EVERYDAY_LIFE
+            )
+        );
     }
 }

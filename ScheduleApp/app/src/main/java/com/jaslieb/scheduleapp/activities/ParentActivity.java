@@ -9,8 +9,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
@@ -19,9 +21,11 @@ import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.services.ParentService;
 import com.jaslieb.scheduleapp.states.ParentState;
+import com.jaslieb.scheduleapp.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -29,15 +33,19 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 
 public class ParentActivity extends AppCompatActivity {
 
-    private Button btAddTasks;
     private EditText etTaskName;
     private EditText etTimeValue;
 
     private Spinner spTaskType;
     private Spinner spTimeUnit;
+    private Spinner spRepeatUnit;
 
     private TimePicker tpTaskTimeBegin;
     private DatePicker dpDateBegin;
+
+    private CheckBox cbHaveRecurrence;
+    private LinearLayout llTaskRecurrence;
+    private Button btAddTasks;
 
     private ParentState state;
     private ParentService service;
@@ -101,22 +109,33 @@ public class ParentActivity extends AppCompatActivity {
         });
 
         tpTaskTimeBegin = findViewById(R.id.tpTaskTimeBegin);
+        tpTaskTimeBegin.setOnTimeChangedListener(
+            (view, hourOfDay, minute) -> updateRepeatUnit()
+        );
 
         dpDateBegin = findViewById(R.id.dpDateBegin);
         dpDateBegin.setMinDate(System.currentTimeMillis());
+        dpDateBegin.setOnDateChangedListener(
+            (view, year, monthOfYear, dayOfMonth) -> updateRepeatUnit()
+        );
+
+        llTaskRecurrence = findViewById(R.id.includeRecurrenceLayout);
+        cbHaveRecurrence = findViewById(R.id.cbHaveRecurrence);
+
+        cbHaveRecurrence.setOnCheckedChangeListener(
+            (buttonView, isChecked) ->
+                llTaskRecurrence.setVisibility(
+                    isChecked ? View.VISIBLE : View.GONE
+                )
+        );
+
+        spRepeatUnit = llTaskRecurrence.findViewById(R.id.spRepeatUnit);
+        updateRepeatUnit();
 
         btAddTasks = findViewById(R.id.btAddTasks);
         btAddTasks.setOnClickListener(v -> {
             String taskName = etTaskName.getText().toString();
-            long beginTime =
-                new GregorianCalendar(
-                    dpDateBegin.getYear(),
-                    dpDateBegin.getMonth(),
-                    dpDateBegin.getDayOfMonth(),
-                    tpTaskTimeBegin.getHour(),
-                    tpTaskTimeBegin.getMinute()
-                )
-                .getTimeInMillis();
+            long beginTime = getBeginTime();
 
             long duration =
                 TimeUnitEnum.find(
@@ -140,16 +159,34 @@ public class ParentActivity extends AppCompatActivity {
         disposable.add(childStateObserver);
     }
 
+    private void updateRepeatUnit() {
+        spRepeatUnit.setAdapter(
+            getTimeUnitAdapter(2)
+        );
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         disposable.dispose();
     }
 
+    private long getBeginTime() {
+        return
+            new GregorianCalendar(
+                dpDateBegin.getYear(),
+                dpDateBegin.getMonth(),
+                dpDateBegin.getDayOfMonth(),
+                tpTaskTimeBegin.getHour(),
+                tpTaskTimeBegin.getMinute()
+            )
+            .getTimeInMillis();
+    }
+
     private ArrayAdapter<String> getTaskTypeAdapter() {
         ArrayList<String> taskTypes = new ArrayList<>();
         for(TaskTypeEnum type: TaskTypeEnum.values()) {
-            taskTypes.add(type.toString());
+                taskTypes.add(type.toString());
         }
 
         return new ArrayAdapter<>(
@@ -160,15 +197,49 @@ public class ParentActivity extends AppCompatActivity {
     }
 
     private ArrayAdapter<String> getTimeUnitAdapter() {
+        return getSpinnerAdapter(
+            getTimeUnits()
+        );
+    }
+
+    private ArrayAdapter<String> getTimeUnitAdapter(int minPosition) {
+        return getSpinnerAdapter(
+            getRecurrenceTimeUnits(minPosition, getBeginTime())
+        );
+    }
+
+    private List<String> getTimeUnits() {
         ArrayList<String> timeUnits = new ArrayList<>();
         for(TimeUnitEnum unit: TimeUnitEnum.values()) {
             timeUnits.add(unit.toString());
         }
+        return timeUnits;
+    }
 
+    private List<String> getRecurrenceTimeUnits(int minPosition, long taskBegin) {
+        ArrayList<String> timeUnits = new ArrayList<>();
+        for(TimeUnitEnum unit: TimeUnitEnum.values()) {
+            if(unit.position >= minPosition) {
+                timeUnits.add(
+                    String.format(
+                        "%s (next on %s)",
+                        unit.toString(),
+                        DateUtil.formatToDateString(
+                            taskBegin + unit.toMilliseconds(1)
+                        )
+                    )
+                );
+            }
+        }
+
+        return timeUnits;
+    }
+
+    private ArrayAdapter<String> getSpinnerAdapter(List<String> strings) {
         return new ArrayAdapter<>(
             this,
             R.layout.support_simple_spinner_dropdown_item,
-            timeUnits
+            strings
         );
     }
 

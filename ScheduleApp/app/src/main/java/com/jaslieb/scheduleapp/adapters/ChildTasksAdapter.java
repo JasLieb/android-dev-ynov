@@ -13,16 +13,11 @@ import androidx.annotation.Nullable;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.jaslieb.scheduleapp.utils.DateUtil;
 
 public class ChildTasksAdapter extends ArrayAdapter<Task> {
-
-    private SimpleDateFormat fmt;
     public ChildTasksAdapter(@NonNull Context context) {
         super(context, 0);
-        fmt = new SimpleDateFormat("dd MMMM yyyy hh:mm");
     }
 
     @NonNull
@@ -41,12 +36,8 @@ public class ChildTasksAdapter extends ArrayAdapter<Task> {
 
         tvTitle.setText(task.name);
         tvTaskDuration.setText(TimeUnitEnum.fromMilliseconds(task.duration));
-        tvDateBegin.setText(format(task.begin));
+        tvDateBegin.setText(DateUtil.formatToDateString(task.begin));
 
         return convertView;
-    }
-
-    private String format(long begin) {
-        return fmt.format(new Date(begin));
     }
 }

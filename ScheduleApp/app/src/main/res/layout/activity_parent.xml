@@ -121,7 +121,6 @@
                         android:layout_marginTop="25dp"
                         android:text="Select task's begin date :"
                         android:textSize="18dp"
-                        android:textAlignment="gravity"
                         />
 
                     <DatePicker
@@ -132,29 +131,36 @@
                         android:layout_marginTop="25dp"
                         />
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Define task's recurrence and reminders :"
+                        android:textSize="18dp"
+                        />
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
                         android:orientation="horizontal"
                         >
 
-                        <CheckBox
-                            android:id="@+id/cbHaveRecurrence"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            />
-
                         <TextView
-                            android:layout_width="match_parent"
+                            android:labelFor="@id/cbHaveRecurrence"
+                            android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="Define recurrence of the Task"
                             android:textSize="16dp"
                             android:gravity="center"
                             />
-                    </LinearLayout>
 
+                        <CheckBox
+                            android:id="@+id/cbHaveRecurrence"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            />
+                    </LinearLayout>
 
                     <include
                         android:id="@+id/includeRecurrenceLayout"
@@ -165,7 +171,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="25dp"
-                        android:text="If you have finished to plan CHILD_NAME 's task :"
+                        android:text="If you have finished to plan CHILD_NAME 's task"
                         android:textSize="18dp"
                         android:textAlignment="center"
                         />

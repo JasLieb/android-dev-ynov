@@ -45,8 +45,10 @@ public class ParentActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             checkEtValueAsTime(
                 etTimeValue,
-                TimeUnitEnum.find(spTaskReminderTU.getSelectedItem().toString()))
-            ;
+                TimeUnitEnum.find(
+                    spTaskDurationTU.getSelectedItem().toString()
+                )
+            );
         }
 
         public void afterTextChanged(Editable s) {}
@@ -183,7 +185,7 @@ public class ParentActivity extends AppCompatActivity {
         spTaskReminderTU.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                checkEtValueAsTime(etTaskReminderValue, TimeUnitEnum.find(position));
+                checkEtValueAsTime(etTaskReminderValue, TimeUnitEnum.find(position + 1));
             }
 
             @Override

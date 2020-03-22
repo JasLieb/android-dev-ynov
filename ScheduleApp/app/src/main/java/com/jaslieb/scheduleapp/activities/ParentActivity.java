@@ -1,7 +1,5 @@
 package com.jaslieb.scheduleapp.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +13,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
@@ -34,17 +34,58 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 public class ParentActivity extends AppCompatActivity {
 
     private EditText etTaskName;
+
     private EditText etTimeValue;
+    private TextWatcher taskTimeTextWatcher = new TextWatcher() {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            checkEtValueAsTime(
+                etTimeValue,
+                TimeUnitEnum.find(spTaskReminderTU.getSelectedItem().toString()))
+            ;
+        }
+
+        public void afterTextChanged(Editable s) {}
+    };
 
     private Spinner spTaskType;
-    private Spinner spTimeUnit;
-    private Spinner spRepeatUnit;
+
+    private LinearLayout llTaskDuration;
+    private Spinner spTaskDurationTU;
 
     private TimePicker tpTaskTimeBegin;
     private DatePicker dpDateBegin;
 
     private CheckBox cbHaveRecurrence;
     private LinearLayout llTaskRecurrence;
+    private Spinner spTaskRecurrenceTU;
+
+    private CheckBox cbHaveReminder;
+    private LinearLayout llTaskReminder;
+    private EditText etTaskReminderValue;
+    private TextWatcher taskReminderTextWatcher = new TextWatcher() {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            checkEtValueAsTime(
+                etTaskReminderValue,
+                TimeUnitEnum.find(spTaskReminderTU.getSelectedItem().toString()))
+            ;
+        }
+
+        public void afterTextChanged(Editable s) {}
+    };
+
+    private Spinner spTaskReminderTU;
+    private Spinner spTaskReminderBeAf;
+
     private Button btAddTasks;
 
     private ParentState state;
@@ -65,6 +106,7 @@ public class ParentActivity extends AppCompatActivity {
             public void onComplete() {}
         };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,35 +115,22 @@ public class ParentActivity extends AppCompatActivity {
         etTaskName = findViewById(R.id.etTaskName);
 
         etTimeValue = findViewById(R.id.etTimeValue);
-        etTimeValue.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkTimeValue(TimeUnitEnum.find(spTimeUnit.getSelectedItem().toString()));
-            }
-
-            public void afterTextChanged(Editable s) {}
-        });
+        etTimeValue.addTextChangedListener(taskTimeTextWatcher);
 
         spTaskType = findViewById(R.id.spTaskType);
         spTaskType.setAdapter(
             getTaskTypeAdapter()
         );
 
-        spTimeUnit = findViewById(R.id.spTimeUnit);
-        spTimeUnit.setAdapter(
+        spTaskDurationTU = findViewById(R.id.spTimeUnit);
+        spTaskDurationTU.setAdapter(
             getTimeUnitAdapter()
         );
 
-        spTimeUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spTaskDurationTU.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TimeUnitEnum timeUnit = TimeUnitEnum.find(position);
-                checkTimeValue(timeUnit);
-                etTimeValue.setHint(formatMaxValue(timeUnit));
+                checkEtValueAsTime(etTimeValue, TimeUnitEnum.find(position));
             }
 
             @Override
@@ -110,18 +139,20 @@ public class ParentActivity extends AppCompatActivity {
 
         tpTaskTimeBegin = findViewById(R.id.tpTaskTimeBegin);
         tpTaskTimeBegin.setOnTimeChangedListener(
-            (view, hourOfDay, minute) -> updateRepeatUnit()
+            (view, hourOfDay, minute) ->
+                updateSpTaskTU(spTaskRecurrenceTU, 2, getTaskBeginTime())
         );
 
         dpDateBegin = findViewById(R.id.dpDateBegin);
         dpDateBegin.setMinDate(System.currentTimeMillis());
         dpDateBegin.setOnDateChangedListener(
-            (view, year, monthOfYear, dayOfMonth) -> updateRepeatUnit()
+            (view, year, monthOfYear, dayOfMonth) ->
+                updateSpTaskTU(spTaskRecurrenceTU, 2, getTaskBeginTime())
         );
 
-        llTaskRecurrence = findViewById(R.id.includeRecurrenceLayout);
-        cbHaveRecurrence = findViewById(R.id.cbHaveRecurrence);
+        llTaskRecurrence = findViewById(R.id.llTaskRecurrence);
 
+        cbHaveRecurrence = findViewById(R.id.cbHaveRecurrence);
         cbHaveRecurrence.setOnCheckedChangeListener(
             (buttonView, isChecked) ->
                 llTaskRecurrence.setVisibility(
@@ -129,17 +160,53 @@ public class ParentActivity extends AppCompatActivity {
                 )
         );
 
-        spRepeatUnit = llTaskRecurrence.findViewById(R.id.spRepeatUnit);
-        updateRepeatUnit();
+        spTaskRecurrenceTU = findViewById(R.id.spTaskRepeatTU);
+        spTaskRecurrenceTU.setAdapter(
+            getTimeUnitAdapter(1, getTaskBeginTime())
+        );
+
+        llTaskReminder = findViewById(R.id.llTaskReminder);
+        cbHaveReminder = findViewById(R.id.cbHaveReminder);
+        cbHaveReminder.setOnCheckedChangeListener(
+            (buttonView, isChecked) ->
+                llTaskReminder.setVisibility( isChecked ? View.VISIBLE : View.GONE)
+        );
+
+        etTaskReminderValue = findViewById(R.id.etTaskReminderValue);
+
+        etTaskReminderValue.addTextChangedListener(taskReminderTextWatcher);
+        spTaskReminderTU = findViewById(R.id.spTaskReminderTU);
+        spTaskReminderTU.setAdapter(
+            getTimeUnitAdapter(1)
+        );
+
+        spTaskReminderTU.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                checkEtValueAsTime(etTaskReminderValue, TimeUnitEnum.find(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        spTaskReminderBeAf = findViewById(R.id.spTaskReminderBeAf);
+        spTaskReminderBeAf.setAdapter(
+            new ArrayAdapter<String>(
+                this,
+                R.layout.support_simple_spinner_dropdown_item,
+                new String[]{"Before", "After"}
+            )
+        );
 
         btAddTasks = findViewById(R.id.btAddTasks);
         btAddTasks.setOnClickListener(v -> {
             String taskName = etTaskName.getText().toString();
-            long beginTime = getBeginTime();
+            long beginTime = getTaskBeginTime();
 
             long duration =
                 TimeUnitEnum.find(
-                    spTimeUnit
+                    spTaskDurationTU
                         .getSelectedItem()
                         .toString()
                 )
@@ -159,11 +226,6 @@ public class ParentActivity extends AppCompatActivity {
         disposable.add(childStateObserver);
     }
 
-    private void updateRepeatUnit() {
-        spRepeatUnit.setAdapter(
-            getTimeUnitAdapter(2)
-        );
-    }
 
     @Override
     protected void onDestroy() {
@@ -171,7 +233,13 @@ public class ParentActivity extends AppCompatActivity {
         disposable.dispose();
     }
 
-    private long getBeginTime() {
+    private void updateSpTaskTU(Spinner sp, int minPosition, long  taskBegin) {
+        sp.setAdapter(
+            getTimeUnitAdapter(minPosition, taskBegin)
+        );
+    }
+
+    private long getTaskBeginTime() {
         return
             new GregorianCalendar(
                 dpDateBegin.getYear(),
@@ -198,40 +266,39 @@ public class ParentActivity extends AppCompatActivity {
 
     private ArrayAdapter<String> getTimeUnitAdapter() {
         return getSpinnerAdapter(
-            getTimeUnits()
+            getTimeUnits(0, 0)
         );
     }
 
     private ArrayAdapter<String> getTimeUnitAdapter(int minPosition) {
         return getSpinnerAdapter(
-            getRecurrenceTimeUnits(minPosition, getBeginTime())
+            getTimeUnits(minPosition, 0)
         );
     }
 
-    private List<String> getTimeUnits() {
-        ArrayList<String> timeUnits = new ArrayList<>();
-        for(TimeUnitEnum unit: TimeUnitEnum.values()) {
-            timeUnits.add(unit.toString());
-        }
-        return timeUnits;
+    private ArrayAdapter<String> getTimeUnitAdapter(int minPosition, long taskBegin) {
+        return getSpinnerAdapter(
+                getTimeUnits(minPosition, taskBegin)
+        );
     }
 
-    private List<String> getRecurrenceTimeUnits(int minPosition, long taskBegin) {
+    private List<String> getTimeUnits(int minPosition, long taskBegin) {
         ArrayList<String> timeUnits = new ArrayList<>();
         for(TimeUnitEnum unit: TimeUnitEnum.values()) {
             if(unit.position >= minPosition) {
                 timeUnits.add(
-                    String.format(
-                        "%s (next on %s)",
-                        unit.toString(),
-                        DateUtil.formatToDateString(
-                            taskBegin + unit.toMilliseconds(1)
+                    taskBegin == 0
+                        ? unit.toString()
+                        : String.format(
+                            "%s (next on %s)",
+                            unit.toString(),
+                            DateUtil.formatToDateString(
+                                    taskBegin + unit.toMilliseconds(1)
+                            )
                         )
-                    )
                 );
             }
         }
-
         return timeUnits;
     }
 
@@ -243,16 +310,17 @@ public class ParentActivity extends AppCompatActivity {
         );
     }
 
-    private void checkTimeValue(TimeUnitEnum timeUnit) {
-        String value = etTimeValue.getText().toString();
+    private void checkEtValueAsTime(EditText et, TimeUnitEnum timeUnit) {
+        String value = et.getText().toString();
         if(
             !value.isEmpty() &&
             Integer.parseInt(value) > timeUnit.max
         ) {
-            etTimeValue.setError(
+            et.setError(
                 String.format("Maximum allowed : %d", timeUnit.max)
             );
         }
+        et.setHint(formatMaxValue(timeUnit));
     }
 
     private String formatMaxValue(TimeUnitEnum timeUnit) {

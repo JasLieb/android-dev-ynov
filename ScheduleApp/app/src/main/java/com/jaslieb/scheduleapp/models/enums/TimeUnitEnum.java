@@ -26,18 +26,18 @@ public enum TimeUnitEnum {
         this.unit = unit;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return unit.name();
+    }
+
     public long toMilliseconds(String s) {
         return Integer.parseInt(s) * unit.getDuration().toMillis();
     }
 
     public long toMilliseconds(int value) {
         return value * unit.getDuration().toMillis();
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return unit.name();
     }
 
     public static List<TimeUnitEnum> values = Arrays.asList(TimeUnitEnum.values());

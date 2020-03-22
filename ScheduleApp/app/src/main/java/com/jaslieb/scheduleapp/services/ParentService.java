@@ -2,8 +2,10 @@ package com.jaslieb.scheduleapp.services;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
+import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.states.ParentState;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
@@ -28,14 +30,23 @@ public class ParentService {
         });
     }
 
-    public void addTask(String name, long beginTime, long duration, TaskTypeEnum type) {
+    public void addTask(
+            String name,
+            long beginTime,
+            long duration,
+            TaskTypeEnum type,
+            TimeUnitEnum recurrence,
+            Reminder reminder
+    ) {
         tasks.add(
             new Task(
                 name,
                 "JohnId",
                 beginTime,
                 duration,
-                type
+                type,
+                recurrence,
+                reminder
             )
         );
     }

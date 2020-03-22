@@ -17,6 +17,7 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.jaslieb.scheduleapp.R;
+import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.services.ParentService;
@@ -32,6 +33,24 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
 public class ParentActivity extends AppCompatActivity {
+
+    private ParentState state;
+    private ParentService service;
+    private CompositeDisposable disposable = new CompositeDisposable();
+
+    private DisposableObserver<ParentState> childStateObserver =
+        new DisposableObserver<ParentState>() {
+            @Override
+            public void onNext(@NonNull ParentState parentState) {
+                state = parentState;
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {}
+
+            @Override
+            public void onComplete() {}
+        };
 
     private EditText etTaskName;
 
@@ -56,7 +75,6 @@ public class ParentActivity extends AppCompatActivity {
 
     private Spinner spTaskType;
 
-    private LinearLayout llTaskDuration;
     private Spinner spTaskDurationTU;
 
     private TimePicker tpTaskTimeBegin;
@@ -68,6 +86,7 @@ public class ParentActivity extends AppCompatActivity {
 
     private CheckBox cbHaveReminder;
     private LinearLayout llTaskReminder;
+    private EditText etTaskCountReminder;
     private EditText etTaskReminderValue;
     private TextWatcher taskReminderTextWatcher = new TextWatcher() {
 
@@ -78,8 +97,10 @@ public class ParentActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             checkEtValueAsTime(
                 etTaskReminderValue,
-                TimeUnitEnum.find(spTaskReminderTU.getSelectedItem().toString()))
-            ;
+                TimeUnitEnum.find(
+                    spTaskReminderTU.getSelectedItem().toString()
+                )
+            );
         }
 
         public void afterTextChanged(Editable s) {}
@@ -89,25 +110,54 @@ public class ParentActivity extends AppCompatActivity {
     private Spinner spTaskReminderBeAf;
 
     private Button btAddTasks;
+    private View.OnClickListener onClickAddTaskListener = v -> {
+        String taskName = etTaskName.getText().toString();
+        TaskTypeEnum type = TaskTypeEnum.find(spTaskType.getSelectedItemId());
 
-    private ParentState state;
-    private ParentService service;
-    private CompositeDisposable disposable = new CompositeDisposable();
+        long beginTime = getTaskBeginTime();
+        long duration =
+            TimeUnitEnum.find(
+                spTaskDurationTU
+                    .getSelectedItem()
+                    .toString()
+            )
+            .toMilliseconds(
+                etTimeValue.getText().toString()
+            );
 
-    private DisposableObserver<ParentState> childStateObserver =
-        new DisposableObserver<ParentState>() {
-            @Override
-            public void onNext(@NonNull ParentState parentState) {
-                state = parentState;
-            }
+        boolean hasRecurrence = cbHaveRecurrence.isChecked();
+        TimeUnitEnum recurrence = null;
+        if(hasRecurrence) {
+            recurrence =
+                    TimeUnitEnum.find(
+                            spTaskRecurrenceTU
+                                    .getSelectedItem()
+                                    .toString()
+                                    .split(" ")[0]
+                    );
+        }
 
-            @Override
-            public void onError(@NonNull Throwable e) {}
+        boolean hasReminder = cbHaveReminder.isChecked();
+        Reminder reminder = null;
+        if(hasReminder) {
+             reminder = new Reminder(
+                spTaskReminderBeAf.getSelectedItem().toString() == "Before",
+                Integer.parseInt(etTaskCountReminder.getText().toString()),
+                 TimeUnitEnum.find(
+                     spTaskReminderTU
+                         .getSelectedItem()
+                         .toString()
+                 )
+                 .toMilliseconds(
+                     etTaskReminderValue.getText().toString()
+                 )
+            );
+        }
 
-            @Override
-            public void onComplete() {}
-        };
-
+        if(taskName.length() > 0) {
+            service.addTask(taskName, beginTime, duration, type, recurrence, reminder);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +224,7 @@ public class ParentActivity extends AppCompatActivity {
                 llTaskReminder.setVisibility( isChecked ? View.VISIBLE : View.GONE)
         );
 
+        etTaskCountReminder = findViewById(R.id.etTaskCountReminder);
         etTaskReminderValue = findViewById(R.id.etTaskReminderValue);
 
         etTaskReminderValue.addTextChangedListener(taskReminderTextWatcher);
@@ -202,26 +253,7 @@ public class ParentActivity extends AppCompatActivity {
         );
 
         btAddTasks = findViewById(R.id.btAddTasks);
-        btAddTasks.setOnClickListener(v -> {
-            String taskName = etTaskName.getText().toString();
-            long beginTime = getTaskBeginTime();
-
-            long duration =
-                TimeUnitEnum.find(
-                    spTaskDurationTU
-                        .getSelectedItem()
-                        .toString()
-                )
-                .toMilliseconds(
-                    etTimeValue.getText().toString()
-                );
-
-            TaskTypeEnum type = TaskTypeEnum.find(spTaskType.getSelectedItemId());
-
-            if(taskName.length() > 0) {
-                service.addTask(taskName, beginTime, duration, type);
-            }
-        });
+        btAddTasks.setOnClickListener(onClickAddTaskListener);
 
         service = new ParentService();
         service.parentStateBehavior.subscribe(childStateObserver);
@@ -315,14 +347,17 @@ public class ParentActivity extends AppCompatActivity {
     private void checkEtValueAsTime(EditText et, TimeUnitEnum timeUnit) {
         String value = et.getText().toString();
         if(
-            !value.isEmpty() &&
-            Integer.parseInt(value) > timeUnit.max
+            !value.isEmpty()
+            && Integer.parseInt(value) > timeUnit.max
         ) {
             et.setError(
                 String.format("Maximum allowed : %d", timeUnit.max)
             );
         }
-        et.setHint(formatMaxValue(timeUnit));
+
+        et.setHint(
+            formatMaxValue(timeUnit)
+        );
     }
 
     private String formatMaxValue(TimeUnitEnum timeUnit) {

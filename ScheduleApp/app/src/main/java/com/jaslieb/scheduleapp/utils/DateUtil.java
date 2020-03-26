@@ -9,13 +9,4 @@ public class DateUtil {
     public static String formatToDateString(long begin) {
         return fmt.format(new Date(begin));
     }
-
-    public static String formatToDateStringPrefixed(String prefix, long begin) {
-        return
-            String.format(
-                "%s %s",
-                prefix,
-                fmt.format(new Date(begin))
-            );
-    }
 }

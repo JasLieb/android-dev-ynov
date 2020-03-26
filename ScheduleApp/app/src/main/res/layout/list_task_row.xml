@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -10,100 +11,185 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
-        android:padding="10sp"
         app:strokeColor="@color/stroke_color"
         app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:orientation="vertical">
+            android:layout_margin="10dp"
+            android:padding="15dp"
+            android:orientation="vertical"
+            android:animateLayoutChanges="true">
 
             <LinearLayout
+                android:id="@+id/llTaskSmall"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/tvTitle"
+                    android:id="@+id/tvTaskTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.75"
+                    android:layout_weight="0.8"
+                    android:layout_gravity="center"
                     android:gravity="center"
                     android:text="Task Title"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/tvTaskBegin"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.75"
-                    android:gravity="center"
-                    android:textSize="14sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="0.75">
 
                     <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Begin Task"
+                        android:src="@drawable/ic_alarm_black_24dp"/>
+
+                    <TextView
+                        android:id="@+id/tvTaskDateBegin"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|top"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="0.75">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
                         android:contentDescription="Duration estimated"
-                        android:src="@drawable/ic_timelapse_black_24dp"/>
+                        android:src="@drawable/ic_time_white_24dp"/>
 
                     <TextView
                         android:id="@+id/tvTaskDuration"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|bottom"
-                        android:text="Duration"
-                        android:textSize="14sp" />
+                        android:layout_height="match_parent"
+                        android:textSize="12sp" />
                 </LinearLayout>
-
             </LinearLayout>
 
             <Button
                 android:id="@+id/btExpandTaskDetails"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10sp"
-                android:text="View taks's details"
-                android:drawableEnd="@drawable/ic_expand_more_black_24dp"/>
-
-            <LinearLayout
-                android:id="@+id/llTaskDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:layout_gravity="end"
+                android:text="Details"
+                android:drawableEnd="@drawable/ic_expand_more_black_24dp"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/llTaskBig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="20sp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="20sp">
 
                     <TextView
+                        android:id="@+id/tvTaskTitleBig"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="top"
+                        android:layout_weight="0.8"
+                        android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="Start :"
-                        android:textSize="12sp" />
+                        android:text="Task Title"
+                        android:textSize="30sp"
+                        android:textStyle="bold"/>
 
-                    <TextView
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
+                        android:orientation="horizontal"
+                        android:padding="10dp"
+                        android:layout_marginTop="20dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Begin Task"
+                            android:src="@drawable/ic_alarm_black_24dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="Start :"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvTaskDateBeginBig"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:gravity="center"
+                            android:text="Date"
+                            android:textSize="22sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="10dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Begin Task"
+                            android:src="@drawable/ic_time_white_24dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="Duration :"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvTaskDurationBig"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
+                            android:gravity="center"
+                            android:text="Date"
+                            android:textSize="22sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llTaskRecurrenceReminder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="Date"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="10dp">
+                        <TextView
+                            android:id="@+id/tvTaskRecurrenceReminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.jaslieb.scheduleapp.R;
+import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.utils.DateUtil;
@@ -21,34 +23,99 @@ import java.util.ArrayList;
 import java.util.List;
 
 class TaskViewHolder extends RecyclerView.ViewHolder {
-    private LinearLayout ll;
-    private LinearLayout llTaskDetails;
+    private static final String BaseRecurrence = "This task will recurrence every ";
+    private LinearLayout llContainer;
+    private LinearLayout llTaskSmall;
+    private MaterialCardView llTaskBig;
     TaskViewHolder(@NonNull View itemView) {
         super(itemView);
-        ll = (LinearLayout) itemView;
+        llContainer = (LinearLayout) itemView;
     }
 
     void bindTo(Task task) {
-        TextView tvTitle = ll.findViewById(R.id.tvTitle);
-        TextView tvTaskDuration = ll.findViewById(R.id.tvTaskDuration);
-        TextView tvDateBegin = ll.findViewById(R.id.tvTaskBegin);
+        TextView tvTaskTitle = llContainer.findViewById(R.id.tvTaskTitle);
+        TextView tvTaskTitleBig = llContainer.findViewById(R.id.tvTaskTitleBig);
+        TextView tvTaskDateBegin = llContainer.findViewById(R.id.tvTaskDateBegin);
+        TextView tvTaskDuration = llContainer.findViewById(R.id.tvTaskDuration);
+        TextView tvTaskDurationBig = llContainer.findViewById(R.id.tvTaskDurationBig);
+        TextView tvTaskDateBeginBig = llContainer.findViewById(R.id.tvTaskDateBeginBig);
 
-        llTaskDetails = ll.findViewById(R.id.llTaskDetails);
+        TextView tvTaskRecurrenceReminder = llContainer.findViewById(R.id.tvTaskRecurrenceReminder);
 
-        tvTitle.setText(task.name);
+        llTaskSmall = llContainer.findViewById(R.id.llTaskSmall);
+        llTaskBig = llContainer.findViewById(R.id.llTaskBig);
+
+        tvTaskTitle.setText(task.name);
+        tvTaskTitleBig.setText(task.name);
+
         tvTaskDuration.setText(TimeUnitEnum.fromMilliseconds(task.duration));
-        tvDateBegin.setText(DateUtil.formatToDateStringPrefixed("Start on ", task.begin));
+        tvTaskDateBegin.setText(DateUtil.formatToDateString(task.begin));
 
-        Button btExpandTaskDetails = ll.findViewById(R.id.btExpandTaskDetails);
+        tvTaskDateBeginBig.setText(DateUtil.formatToDateString(task.begin));
+        tvTaskDurationBig.setText(TimeUnitEnum.fromMilliseconds(task.duration));
+
+        LinearLayout llTaskRecurrenceReminder = llContainer.findViewById(R.id.llTaskRecurrenceReminder);
+        String reminder = getTextRecurrenceReminder(task);
+        tvTaskRecurrenceReminder.setText(reminder);
+        if(reminder.length() == 0) llTaskRecurrenceReminder.setVisibility(View.GONE);
+
+        Button btExpandTaskDetails = llContainer.findViewById(R.id.btExpandTaskDetails);
         btExpandTaskDetails.setOnClickListener(
             v -> toggleTaskDetailsVisibility()
         );
     }
 
-    private void toggleTaskDetailsVisibility() {
-        llTaskDetails.setVisibility(
-            View.VISIBLE
+    private String getTextRecurrenceReminder(Task task) {
+        return
+            String.format(
+                "%s\n\n%s",
+                getTextRecurrence(task.recurrence),
+                getTextReminder(task)
+            )
+            .trim();
+    }
+
+    private String getTextRecurrence(TimeUnitEnum unit) {
+        if (unit == null) return "";
+        return String.format("%s %s", BaseRecurrence, unit);
+    }
+
+    private String getTextReminder(Task task) {
+        Reminder reminder = task.reminder;
+
+        if (reminder == null) return "";
+        return  String.format(
+            "You'll be reminded %s time%s every %s %s the task\n\nYou will receive first notification at %s",
+            reminder.count,
+            reminder.count > 1 ? "s" : "",
+            TimeUnitEnum.fromMilliseconds(reminder.duration),
+            reminder.isBeforeTask ? "before" : "after",
+            calcFirstReminder(task.begin, reminder)
         );
+    }
+
+    private String calcFirstReminder(long begin, Reminder reminder) {
+        if (reminder.isBeforeTask) {
+            return
+                DateUtil.formatToDateString(
+                    begin - reminder.count * reminder.duration)
+                ;
+        } else {
+            return
+                DateUtil.formatToDateString(
+                    begin - reminder.count * reminder.duration)
+                ;
+        }
+    }
+
+    private void toggleTaskDetailsVisibility() {
+        if(llTaskBig.getVisibility() == View.VISIBLE) {
+            llTaskSmall.setVisibility(View.VISIBLE);
+            llTaskBig.setVisibility(View.GONE);
+        } else {
+            llTaskSmall.setVisibility(View.GONE);
+            llTaskBig.setVisibility(View.VISIBLE);
+        }
     }
 }
 
@@ -67,8 +134,8 @@ public class ChildTasksAdapter extends ListAdapter<Task, TaskViewHolder> {
             @Override
             public boolean areContentsTheSame(
                 @NonNull Task oldTask,
-                @NonNull Task newTask)
-            {
+                @NonNull Task newTask
+            ) {
                 return false;
             }
         };
@@ -81,14 +148,14 @@ public class ChildTasksAdapter extends ListAdapter<Task, TaskViewHolder> {
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout llListRow =
-            (LinearLayout) LayoutInflater
+        return new TaskViewHolder(
+            LayoutInflater
                 .from(parent.getContext())
                 .inflate(
                     R.layout.list_task_row, parent,
-                   false
-                );
-        return new TaskViewHolder(llListRow);
+                    false
+                )
+        );
     }
 
     @Override

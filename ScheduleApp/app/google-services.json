@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "792974748341",
+    "firebase_url": "https://schedule-android-ynov.firebaseio.com",
+    "project_id": "schedule-android-ynov",
+    "storage_bucket": "schedule-android-ynov.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792974748341:android:9581a5599c4480dc34acfc",
+        "android_client_info": {
+          "package_name": "com.jaslieb.scheduleapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792974748341-kmvs7pe8io6j2sro5q9kofukmjakuddv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiiC6Q5xdUfT1n-P7Qw0s74wXWDdBI_NM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792974748341-kmvs7pe8io6j2sro5q9kofukmjakuddv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -20,7 +20,7 @@ import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-import com.jaslieb.scheduleapp.services.ParentService;
+import com.jaslieb.scheduleapp.actors.ParentActor;
 import com.jaslieb.scheduleapp.states.ParentState;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 
@@ -35,7 +35,7 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 public class ParentActivity extends AppCompatActivity {
 
     private ParentState state;
-    private ParentService service;
+    private ParentActor service;
     private CompositeDisposable disposable = new CompositeDisposable();
 
     private DisposableObserver<ParentState> childStateObserver =
@@ -255,7 +255,7 @@ public class ParentActivity extends AppCompatActivity {
         btAddTasks = findViewById(R.id.btAddTasks);
         btAddTasks.setOnClickListener(onClickAddTaskListener);
 
-        service = new ParentService();
+        service = new ParentActor();
         service.parentStateBehavior.subscribe(childStateObserver);
         disposable.add(childStateObserver);
     }

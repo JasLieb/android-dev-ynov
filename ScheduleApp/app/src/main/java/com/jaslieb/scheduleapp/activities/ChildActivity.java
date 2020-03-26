@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.adapters.ChildTasksAdapter;
-import com.jaslieb.scheduleapp.services.ChildService;
+import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.states.ChildState;
 
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -18,7 +18,7 @@ public class ChildActivity extends AppCompatActivity {
     private ListView taskList;
     private ChildTasksAdapter tasksAdapter;
 
-    private ChildService service;
+    private ChildActor service;
     private CompositeDisposable disposable = new CompositeDisposable();
 
     private DisposableObserver<ChildState> childStateObserver =
@@ -49,7 +49,7 @@ public class ChildActivity extends AppCompatActivity {
         // list.setOnItemClickListener();
         // list.setOnItemSelectedListener();
 
-        service = new ChildService();
+        service = new ChildActor();
         service.childStateBehavior.subscribe(childStateObserver);
         disposable.add(childStateObserver);
     }

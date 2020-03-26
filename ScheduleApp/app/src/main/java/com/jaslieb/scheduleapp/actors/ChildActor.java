@@ -1,4 +1,4 @@
-package com.jaslieb.scheduleapp.services;
+package com.jaslieb.scheduleapp.actors;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-public class ChildService {
+public class ChildActor {
 
     private CollectionReference tasks;
     public BehaviorSubject<ChildState> childStateBehavior;
 
-    public ChildService() {
+    public ChildActor() {
         childStateBehavior = BehaviorSubject.createDefault(ChildState.Default);
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();

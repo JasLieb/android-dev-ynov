@@ -27,8 +27,9 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:orientation="horizontal"
+                android:layout_marginBottom="25dp"
                 android:visibility="gone">
-
+                <!-- Visibility gone only for design-->
                 <TextView
                     android:id="@+id/tvTaskTitle"
                     android:layout_width="match_parent"
@@ -85,7 +86,7 @@
                 android:id="@+id/btExpandTaskDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
+                android:layout_gravity="center"
                 android:text="Details"
                 android:drawableEnd="@drawable/ic_expand_more_black_24dp"/>
 
@@ -93,7 +94,9 @@
                 android:id="@+id/llTaskBig"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 app:cardElevation="20sp">
+                <!-- Only for design purpose -->
 <!--                android:visibility="gone"-->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -180,7 +183,7 @@
                         android:orientation="horizontal"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginTop="25dp">
                         <TextView
                             android:id="@+id/tvTaskRecurrenceReminder"
                             android:layout_width="wrap_content"
@@ -193,16 +196,14 @@
                         android:id="@+id/llTaskState"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:orientation="horizontal"
-                        android:padding="10dp"
-                        >
+                        android:gravity="center"
+                        android:layout_marginTop="25dp">
                         <Button
                             android:id="@+id/btTaskDone"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="10dp"
                             android:layout_weight="0.5"
                             android:backgroundTint="@color/green"
                             android:text="Done !" />
@@ -210,9 +211,8 @@
                         <Button
                             android:id="@+id/btTaskNotDone"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="10dp"
                             android:layout_weight="0.5"
                             android:backgroundTint="@color/red"
                             android:text="I'll be late" />

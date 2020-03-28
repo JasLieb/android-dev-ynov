@@ -32,7 +32,7 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout llContainer;
     private LinearLayout llTaskSmall;
-    private LinearLayout llTaskRecurrenceReminder;
+    private LinearLayout llTaskState;
 
     private MaterialCardView llTaskBig;
 
@@ -64,7 +64,7 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
         tvTaskDateBeginBig.setText(DateUtil.formatToDateString(task.begin));
         tvTaskDurationBig.setText(TimeUnitEnum.fromMilliseconds(task.duration));
 
-        llTaskRecurrenceReminder = llContainer.findViewById(R.id.llTaskRecurrenceReminder);
+        LinearLayout llTaskRecurrenceReminder = llContainer.findViewById(R.id.llTaskRecurrenceReminder);
         String reminder = getTextRecurrenceReminder(task);
         tvTaskRecurrenceReminder.setText(reminder);
         if(reminder.length() == 0) llTaskRecurrenceReminder.setVisibility(View.GONE);
@@ -74,14 +74,27 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
             v -> toggleTaskDetailsVisibility()
         );
 
+        llTaskState = llContainer.findViewById(R.id.llTaskState);
+        setTaskButtonVisibility(task);
+
+
         Button btTaskDone = llContainer.findViewById(R.id.btTaskDone);
         btTaskDone.setOnClickListener(
-                v -> childActor.updateTaskAsDone(task.name)
+            v -> childActor.updateTaskAsDone(task.name)
         );
 
         Button btTaskNotDone = llContainer.findViewById(R.id.btTaskNotDone);
         btTaskNotDone.setOnClickListener(
-                v -> childActor.warmParentForTask(task.name)
+            v -> childActor.warmParentForTask(task.name)
+        );
+    }
+
+    private void setTaskButtonVisibility(Task task) {
+        long beginShowButton = (long) (task.begin + task.duration * 0.5);
+        llTaskState.setVisibility(
+            System.currentTimeMillis() > beginShowButton
+                ? View.VISIBLE
+                : View.GONE
         );
     }
 

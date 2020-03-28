@@ -130,12 +130,12 @@ public class ParentActivity extends AppCompatActivity {
         TimeUnitEnum recurrence = null;
         if(hasRecurrence) {
             recurrence =
-                    TimeUnitEnum.find(
-                            spTaskRecurrenceTU
-                                    .getSelectedItem()
-                                    .toString()
-                                    .split(" ")[0]
-                    );
+                TimeUnitEnum.find(
+                    spTaskRecurrenceTU
+                        .getSelectedItem()
+                        .toString()
+                        .split(" ")[0]
+                );
         }
 
         boolean hasReminder = cbHaveReminder.isChecked();
@@ -246,7 +246,7 @@ public class ParentActivity extends AppCompatActivity {
 
         spTaskReminderBeAf = findViewById(R.id.spTaskReminderBeAf);
         spTaskReminderBeAf.setAdapter(
-            new ArrayAdapter<String>(
+            new ArrayAdapter<>(
                 this,
                 R.layout.support_simple_spinner_dropdown_item,
                 new String[]{"Before", "After"}

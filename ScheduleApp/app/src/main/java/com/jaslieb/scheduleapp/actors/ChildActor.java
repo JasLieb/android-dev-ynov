@@ -1,6 +1,9 @@
 package com.jaslieb.scheduleapp.actors;
 
+import android.telephony.SmsManager;
+
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.states.ChildState;
@@ -37,5 +40,20 @@ public class ChildActor {
                 )
             );
         });
+    }
+
+    public void updateTaskAsDone(String name) {
+        tasks.whereEqualTo("name", name)
+            .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                assert queryDocumentSnapshots != null;
+                for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    doc.getReference().delete();
+                }
+            });
+    }
+
+    public void warmParentForTask(String name) {
+        SmsManager manager = SmsManager.getDefault();
+        manager.sendTextMessage("0609580401", null, name + "will not be finished in time", null, null);
     }
 }

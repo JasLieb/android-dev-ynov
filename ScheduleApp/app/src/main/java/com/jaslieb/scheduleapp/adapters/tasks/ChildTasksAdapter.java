@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 import com.jaslieb.scheduleapp.R;
+import com.jaslieb.scheduleapp.activities.ChildActivity;
 import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
@@ -24,12 +25,19 @@ import java.util.List;
 
 class TaskViewHolder extends RecyclerView.ViewHolder {
     private static final String BaseRecurrence = "This task will recurrence every ";
+
+    private  ChildActivity childActor;
+
     private LinearLayout llContainer;
     private LinearLayout llTaskSmall;
+    private LinearLayout llTaskRecurrenceReminder;
+
     private MaterialCardView llTaskBig;
-    TaskViewHolder(@NonNull View itemView) {
+
+    TaskViewHolder(ChildActivity childActivity, @NonNull View itemView) {
         super(itemView);
         llContainer = (LinearLayout) itemView;
+        this.childActor = childActivity;
     }
 
     void bindTo(Task task) {
@@ -54,7 +62,7 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
         tvTaskDateBeginBig.setText(DateUtil.formatToDateString(task.begin));
         tvTaskDurationBig.setText(TimeUnitEnum.fromMilliseconds(task.duration));
 
-        LinearLayout llTaskRecurrenceReminder = llContainer.findViewById(R.id.llTaskRecurrenceReminder);
+        llTaskRecurrenceReminder = llContainer.findViewById(R.id.llTaskRecurrenceReminder);
         String reminder = getTextRecurrenceReminder(task);
         tvTaskRecurrenceReminder.setText(reminder);
         if(reminder.length() == 0) llTaskRecurrenceReminder.setVisibility(View.GONE);
@@ -62,6 +70,16 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
         Button btExpandTaskDetails = llContainer.findViewById(R.id.btExpandTaskDetails);
         btExpandTaskDetails.setOnClickListener(
             v -> toggleTaskDetailsVisibility()
+        );
+
+        Button btTaskDone = llContainer.findViewById(R.id.btTaskDone);
+        btTaskDone.setOnClickListener(
+                v -> childActor.updateTaskAsDone(task.name)
+        );
+
+        Button btTaskNotDone = llContainer.findViewById(R.id.btTaskNotDone);
+        btTaskNotDone.setOnClickListener(
+                v -> childActor.warmParentForTask(task.name)
         );
     }
 
@@ -112,6 +130,7 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
         if(llTaskBig.getVisibility() == View.VISIBLE) {
             llTaskSmall.setVisibility(View.VISIBLE);
             llTaskBig.setVisibility(View.GONE);
+            llTaskRecurrenceReminder.setVisibility(View.GONE);
         } else {
             llTaskSmall.setVisibility(View.GONE);
             llTaskBig.setVisibility(View.VISIBLE);
@@ -120,6 +139,7 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
 }
 
 public class ChildTasksAdapter extends ListAdapter<Task, TaskViewHolder> {
+    private ChildActivity childActivity;
     private List<Task> tasks;
 
     private static final DiffUtil.ItemCallback<Task> DIFF_CALLBACK =
@@ -140,8 +160,9 @@ public class ChildTasksAdapter extends ListAdapter<Task, TaskViewHolder> {
             }
         };
 
-    public ChildTasksAdapter() {
+    public ChildTasksAdapter(ChildActivity childActivity) {
         super(DIFF_CALLBACK);
+        this.childActivity = childActivity;
         tasks = new ArrayList<>();
     }
 
@@ -149,6 +170,7 @@ public class ChildTasksAdapter extends ListAdapter<Task, TaskViewHolder> {
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new TaskViewHolder(
+            childActivity,
             LayoutInflater
                 .from(parent.getContext())
                 .inflate(

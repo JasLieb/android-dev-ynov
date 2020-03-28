@@ -1,12 +1,8 @@
 package com.jaslieb.scheduleapp.activities;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +17,6 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 
 public class ChildActivity extends AppCompatActivity {
 
-    private static final int PERMISSIONS_REQUEST_SEND_SMS = 1;
     private ChildTasksAdapter tasksAdapter;
 
     private ChildActor childActor;
@@ -66,33 +61,7 @@ public class ChildActivity extends AppCompatActivity {
     }
 
     public void warmParentForTask(String name) {
-        if (
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.SEND_SMS
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Permission is not granted
-            if (
-                ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.SEND_SMS
-                )
-            ) {
-              // Close app
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{
-                            Manifest.permission.SEND_SMS
-                    },
-                    PERMISSIONS_REQUEST_SEND_SMS
-                );
-            }
-        } else {
-            childActor.warmParentForTask(name);
-        }
+        childActor.warmParentForTask(name);
     }
 
     public void updateTaskAsDone(String name) {

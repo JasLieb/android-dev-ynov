@@ -30,13 +30,13 @@ public class AlarmService extends Service {
             @Override
             public void onNext(@NonNull ChildState childState) {
                 assert alarmMgr != null;
-                int i = 0;
+                int notificationId = 0;
                 for(Task task : childState.tasks) {
                     Context context = getApplicationContext();
                     Intent alarmReceiverIntent = new Intent(context, AlarmTriggerReceiver.class);
                     alarmReceiverIntent.putExtra("task_name", task.name);
 
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(context, i, alarmReceiverIntent, 0);
+                    PendingIntent alarmIntent = PendingIntent.getBroadcast(context, notificationId, alarmReceiverIntent, 0);
                     alarmMgr.cancel(alarmIntent);
 
                     long triggerTime = task.begin + task.duration;
@@ -54,7 +54,7 @@ public class AlarmService extends Service {
                         alarmIntent
                     );
 
-                    i++;
+                    notificationId++;
                 }
             }
 

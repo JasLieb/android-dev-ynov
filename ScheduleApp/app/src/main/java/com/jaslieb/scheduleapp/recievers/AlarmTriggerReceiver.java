@@ -1,5 +1,6 @@
 package com.jaslieb.scheduleapp.recievers;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -40,16 +41,32 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
             notificationManager.createNotificationChannel(channel);
         }
 
-        Intent alarmReceiverIntent = new Intent(context, AlarmActionReceiver.class);
-        PendingIntent piAlarmReceiver = PendingIntent.getBroadcast(context, counter, alarmReceiverIntent, 0);
-
         String taskName = intent.getStringExtra("task_name");
         assert taskName != null;
+
+        notificationManager.notify(
+            counter,
+            makeNotification(
+                context,
+                channelId,
+                taskName
+            )
+        );
+        counter++;
+    }
+
+    private Notification makeNotification(
+            Context context,
+            String channelId,
+            String taskName
+    ) {
+        Intent alarmReceiverIntent = new Intent(context, AlarmActionReceiver.class);
+        PendingIntent piAlarmReceiver = PendingIntent.getBroadcast(context, counter, alarmReceiverIntent, 0);
 
         NotificationCompat.Builder build =
             new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_alarm_black_24dp)
-                .setContentTitle(taskName + " done")
+                .setContentTitle(taskName + " is finished ?")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(piAlarmReceiver)
                 .addAction(
@@ -74,8 +91,7 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
                     )
                 );
 
-        notificationManager.notify(counter, build.build());
-        counter++;
+        return build.build();
     }
 
     private Intent intentWithAction(Intent intent, int notificationId, String taskName ) {

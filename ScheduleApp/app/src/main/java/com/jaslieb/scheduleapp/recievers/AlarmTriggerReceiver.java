@@ -11,6 +11,7 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.jaslieb.scheduleapp.R;
+import com.jaslieb.scheduleapp.models.Task;
 
 public class AlarmTriggerReceiver extends BroadcastReceiver{
 
@@ -43,10 +44,13 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
         Intent alarmReceiverIntent = new Intent(context, AlarmActionReceiver.class);
         PendingIntent piAlarmReceiver = PendingIntent.getBroadcast(context, counter, alarmReceiverIntent, 0);
 
+        String taskName = intent.getStringExtra("task_name");
+        assert taskName != null;
+
         NotificationCompat.Builder build =
             new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_alarm_black_24dp)
-                .setContentTitle(intent.getStringExtra("taskName") + " done")
+                .setContentTitle(taskName + " done")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(piAlarmReceiver)
                 .addAction(
@@ -56,7 +60,7 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
                         .getBroadcast(
                             context,
                             counter,
-                            intentWithAction(alarmReceiverIntent, counter, true),
+                            intentWithAction(alarmReceiverIntent, counter, taskName, true),
                             PendingIntent.FLAG_ONE_SHOT
                         )
                 )
@@ -66,7 +70,7 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
                     PendingIntent.getBroadcast(
                         context,
                         counter,
-                        intentWithAction(alarmReceiverIntent, counter),
+                        intentWithAction(alarmReceiverIntent, counter, taskName),
                         PendingIntent.FLAG_ONE_SHOT
                     )
                 );
@@ -75,17 +79,18 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
         counter++;
     }
 
-    private Intent intentWithAction(Intent intent, int notificationId) {
-        return intentWithAction(intent, notificationId, false);
+    private Intent intentWithAction(Intent intent, int notificationId, String taskName ) {
+        return intentWithAction(intent, notificationId, taskName, false);
     }
 
-    private Intent intentWithAction(Intent intent, int notificationId, boolean isDone) {
+    private Intent intentWithAction(Intent intent, int notificationId, String taskName, boolean isDone) {
         intent.setAction(
             isDone
             ? "done"
             : "not_yet"
         );
 
+        intent.putExtra("task_name", taskName);
         intent.putExtra("notification_id", notificationId);
         return intent;
     }

@@ -32,8 +32,8 @@
         </activity>
 
         <service android:name=".services.AlarmService" />
-        <receiver android:name=".recievers.AlarmTriggerReceiver" android:enabled="true" />
-        <receiver android:name=".recievers.AlarmActionReceiver" android:enabled="true" />
+        <receiver android:name=".recievers.AlarmTriggerReceiver" />
+        <receiver android:name=".recievers.AlarmActionReceiver" />
     </application>
 
 </manifest>

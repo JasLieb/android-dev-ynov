@@ -17,6 +17,8 @@ import com.jaslieb.scheduleapp.recievers.AlarmActionReceiver;
 import com.jaslieb.scheduleapp.recievers.AlarmTriggerReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 
+import java.io.Serializable;
+
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -34,15 +36,14 @@ public class AlarmService extends Service {
                 for(Task task : childState.tasks) {
                     Context context = getApplicationContext();
                     Intent alarmReceiverIntent = new Intent(context, AlarmTriggerReceiver.class);
-
-                    alarmReceiverIntent.putExtra("taskName", task.name);
+                    alarmReceiverIntent.putExtra("task_name", task.name);
 
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(context, i, alarmReceiverIntent, 0);
                     alarmMgr.cancel(alarmIntent);
 
                     long triggerTime = task.begin + task.duration;
 
-                    if(task.reminder != null ) {
+                    if (task.reminder != null) {
                         triggerTime =
                             task.reminder.isBeforeTask
                                 ? task.begin - task.reminder.duration
@@ -52,7 +53,7 @@ public class AlarmService extends Service {
                     alarmMgr.set(
                         AlarmManager.RTC_WAKEUP,
                         triggerTime,
-                            alarmIntent
+                        alarmIntent
                     );
 
                     i++;

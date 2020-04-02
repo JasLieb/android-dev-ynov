@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-public class ChildActor {
+public class ChildActor{
 
     private CollectionReference tasks;
     public BehaviorSubject<ChildState> childStateBehavior;
@@ -54,6 +54,12 @@ public class ChildActor {
 
     public void warmParentForTask(String name) {
         SmsManager manager = SmsManager.getDefault();
-        manager.sendTextMessage("0609580401", null, name + "will not be finished in time", null, null);
+        manager.sendTextMessage(
+            "0609580401",
+            null,
+            name + " will not be finished in time",
+            null,
+            null
+        );
     }
 }

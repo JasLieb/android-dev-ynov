@@ -1,5 +1,6 @@
 package com.jaslieb.scheduleapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.adapters.tasks.ChildTasksAdapter;
+import com.jaslieb.scheduleapp.services.AlarmService;
 import com.jaslieb.scheduleapp.states.ChildState;
 
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -42,6 +44,11 @@ public class ChildActivity extends AppCompatActivity {
         setContentView(R.layout.activity_child);
 
         childActor = new ChildActor();
+
+        if(!AlarmService.isRunning) {
+            Intent intent = new Intent(this, AlarmService.class);
+            startService(intent);
+        }
 
         tasksAdapter = new ChildTasksAdapter(this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);

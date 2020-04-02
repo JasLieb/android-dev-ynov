@@ -17,8 +17,6 @@ import com.jaslieb.scheduleapp.recievers.AlarmActionReceiver;
 import com.jaslieb.scheduleapp.recievers.AlarmTriggerReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 
-import java.io.Serializable;
-
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;

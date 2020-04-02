@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.jaslieb.scheduleapp.actors.ChildActor;
-import com.jaslieb.scheduleapp.models.Task;
 
 public class AlarmActionReceiver extends BroadcastReceiver {
 

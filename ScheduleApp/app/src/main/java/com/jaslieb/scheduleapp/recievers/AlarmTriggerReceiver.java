@@ -11,7 +11,6 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.jaslieb.scheduleapp.R;
-import com.jaslieb.scheduleapp.models.Task;
 
 public class AlarmTriggerReceiver extends BroadcastReceiver{
 

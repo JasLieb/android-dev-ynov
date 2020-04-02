@@ -20,7 +20,7 @@ import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-import com.jaslieb.scheduleapp.services.ParentService;
+import com.jaslieb.scheduleapp.actors.ParentActor;
 import com.jaslieb.scheduleapp.states.ParentState;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 
@@ -32,10 +32,12 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
+import static java.lang.String.*;
+
 public class ParentActivity extends AppCompatActivity {
 
     private ParentState state;
-    private ParentService service;
+    private ParentActor service;
     private CompositeDisposable disposable = new CompositeDisposable();
 
     private DisposableObserver<ParentState> childStateObserver =
@@ -109,7 +111,6 @@ public class ParentActivity extends AppCompatActivity {
     private Spinner spTaskReminderTU;
     private Spinner spTaskReminderBeAf;
 
-    private Button btAddTasks;
     private View.OnClickListener onClickAddTaskListener = v -> {
         String taskName = etTaskName.getText().toString();
         TaskTypeEnum type = TaskTypeEnum.find(spTaskType.getSelectedItemId());
@@ -129,12 +130,12 @@ public class ParentActivity extends AppCompatActivity {
         TimeUnitEnum recurrence = null;
         if(hasRecurrence) {
             recurrence =
-                    TimeUnitEnum.find(
-                            spTaskRecurrenceTU
-                                    .getSelectedItem()
-                                    .toString()
-                                    .split(" ")[0]
-                    );
+                TimeUnitEnum.find(
+                    spTaskRecurrenceTU
+                        .getSelectedItem()
+                        .toString()
+                        .split(" ")[0]
+                );
         }
 
         boolean hasReminder = cbHaveReminder.isChecked();
@@ -245,17 +246,17 @@ public class ParentActivity extends AppCompatActivity {
 
         spTaskReminderBeAf = findViewById(R.id.spTaskReminderBeAf);
         spTaskReminderBeAf.setAdapter(
-            new ArrayAdapter<String>(
+            new ArrayAdapter<>(
                 this,
                 R.layout.support_simple_spinner_dropdown_item,
                 new String[]{"Before", "After"}
             )
         );
 
-        btAddTasks = findViewById(R.id.btAddTasks);
+        Button btAddTasks = findViewById(R.id.btAddTasks);
         btAddTasks.setOnClickListener(onClickAddTaskListener);
 
-        service = new ParentService();
+        service = new ParentActor();
         service.parentStateBehavior.subscribe(childStateObserver);
         disposable.add(childStateObserver);
     }
@@ -323,7 +324,7 @@ public class ParentActivity extends AppCompatActivity {
                 timeUnits.add(
                     taskBegin == 0
                         ? unit.toString()
-                        : String.format(
+                        : format(
                             "%s (next on %s)",
                             unit.toString(),
                             DateUtil.formatToDateString(
@@ -351,7 +352,7 @@ public class ParentActivity extends AppCompatActivity {
             && Integer.parseInt(value) > timeUnit.max
         ) {
             et.setError(
-                String.format("Maximum allowed : %d", timeUnit.max)
+                format("Maximum allowed : %d", timeUnit.max)
             );
         }
 
@@ -361,6 +362,6 @@ public class ParentActivity extends AppCompatActivity {
     }
 
     private String formatMaxValue(TimeUnitEnum timeUnit) {
-        return String.format("Max : %d", timeUnit.max);
+        return format("Max : %d", timeUnit. max);
     }
 }

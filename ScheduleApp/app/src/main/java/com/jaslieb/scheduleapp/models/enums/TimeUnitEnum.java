@@ -51,7 +51,11 @@ public enum TimeUnitEnum {
         for(TimeUnitEnum type: invertedValues) {
             long divider = type.toMilliseconds(1);
             if( milli % divider == 0){
-                return Math.floor(milli / divider) + "\n " +  type.toString().toLowerCase();
+                return String.format(
+                    "%s %s",
+                    Math.floor(milli / divider),
+                    type.toString().toLowerCase()
+                );
             }
         }
         throw new Error();

@@ -8,11 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.recievers.AlarmActionReceiver;
 import com.jaslieb.scheduleapp.recievers.AlarmNotificationReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
@@ -27,7 +29,7 @@ public class AlarmService extends Service {
     public static boolean isRunning = false;
     public static PublishSubject<Integer> makeNotificationStream = PublishSubject.create();
 
-
+    private ChildActor childActor;
     private CompositeDisposable disposable = new CompositeDisposable();
     private DisposableObserver<ChildState> childStateObserver =
         new DisposableObserver<ChildState>() {
@@ -35,6 +37,10 @@ public class AlarmService extends Service {
             public void onNext(@NonNull ChildState childState) {
                 assert alarmMgr != null;
                 int notificationId = 0;
+                childState.tasks.sort(
+                    (sA, sB) -> Long.compare(sB.begin, sA.begin)
+                );
+                long beginNextTask = 0;
                 for(Task task : childState.tasks) {
                     Context context = getApplicationContext();
                     Intent alarmReceiverIntent = new Intent(context, AlarmNotificationReceiver.class);
@@ -43,22 +49,17 @@ public class AlarmService extends Service {
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(context, notificationId, alarmReceiverIntent, 0);
                     alarmMgr.cancel(alarmIntent);
 
-                    long triggerTime = task.begin + task.duration;
-
-                    if (task.reminder != null) {
-                        triggerTime =
-                            task.reminder.isBeforeTask
-                                ? task.begin - task.reminder.duration
-                                : task.begin + task.reminder.duration;
+                    long triggerTime = makeTriggerTime(task, beginNextTask);
+                    if(triggerTime > System.currentTimeMillis()) {
+                        alarmMgr.set(
+                            AlarmManager.RTC_WAKEUP,
+                            triggerTime,
+                            alarmIntent
+                        );
                     }
 
-                    alarmMgr.set(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerTime,
-                        alarmIntent
-                    );
-
                     notificationId++;
+                    beginNextTask = task.begin;
                 }
             }
 
@@ -77,7 +78,7 @@ public class AlarmService extends Service {
         Context context = getApplicationContext();
         alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
-        ChildActor childActor = new ChildActor();
+        childActor = new ChildActor();
 
         Observable.combineLatest(
             AlarmService.makeNotificationStream,
@@ -118,5 +119,29 @@ public class AlarmService extends Service {
         AlarmService.isRunning = false;
         disposable.dispose();
         super.onDestroy();
+    }
+
+    private long makeTriggerTime(Task task, long beginNextTask) {
+        long trigger = task.begin + task.duration;
+        if (
+            beginNextTask - trigger
+            > TimeUnitEnum.MINUTES.toMilliseconds(5)
+        ) {
+//            childActor.warmParentForTask(task.name);
+            // No more reminder
+            childActor.removeReminderFor(task);
+        }
+        else if (task.reminder != null) {
+            Log.d("SERVICE", task.reminder.displayedCount  + " / " +  task.reminder.count);
+            if(task.reminder.displayedCount < task.reminder.count) {
+                trigger =
+                    task.reminder.isBeforeTask
+                        ? task.begin - task.reminder.duration
+                        : task.begin + task.reminder.duration;
+
+                childActor.updateReminderDisplayedCount(task);
+            }
+        }
+        return trigger;
     }
 }

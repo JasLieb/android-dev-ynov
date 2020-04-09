@@ -52,6 +52,26 @@ public class ChildActor{
             });
     }
 
+    public void updateReminderDisplayedCount(Task task) {
+        tasks.whereEqualTo("name", task.name)
+            .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                assert queryDocumentSnapshots != null;
+                for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    doc.getReference().update("reminder.displayedCount",  task.reminder.displayedCount++);
+                }
+            });
+    }
+
+    public void removeReminderFor(Task task) {
+        tasks.whereEqualTo("name", task.name)
+            .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                assert queryDocumentSnapshots != null;
+                for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    doc.getReference().update("reminder",  null);
+                }
+            });
+    }
+
     public void warmParentForTask(String name) {
         SmsManager manager = SmsManager.getDefault();
         manager.sendTextMessage(

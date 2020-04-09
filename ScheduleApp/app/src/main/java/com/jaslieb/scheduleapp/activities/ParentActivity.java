@@ -151,7 +151,8 @@ public class ParentActivity extends AppCompatActivity {
                  )
                  .toMilliseconds(
                      etTaskReminderValue.getText().toString()
-                 )
+                 ),
+                 0
             );
         }
 

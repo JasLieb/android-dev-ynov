@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.adapters.tasks.ChildTasksAdapter;
+import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.services.AlarmService;
 import com.jaslieb.scheduleapp.states.ChildState;
 
@@ -77,8 +78,8 @@ public class ChildActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    public void warmParentForTask(String name) {
-        childActor.warmParentForTask(name);
+    public void warmParentForTask(Task task) {
+        childActor.warnParentForTask(task, false);
     }
 
     public void updateTaskAsDone(String name) {

@@ -46,7 +46,8 @@ public class ParentActor {
                 duration,
                 type,
                 recurrence,
-                reminder
+                reminder,
+                false
             )
         );
     }

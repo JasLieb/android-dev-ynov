@@ -85,7 +85,7 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
 
         Button btTaskNotDone = llContainer.findViewById(R.id.btTaskNotDone);
         btTaskNotDone.setOnClickListener(
-            v -> childActor.warmParentForTask(task.name)
+            v -> childActor.warmParentForTask(task)
         );
     }
 

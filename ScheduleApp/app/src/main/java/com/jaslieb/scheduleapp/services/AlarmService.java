@@ -40,7 +40,7 @@ public class AlarmService extends Service {
                 childState.tasks.sort(
                     (sA, sB) -> Long.compare(sB.begin, sA.begin)
                 );
-                long beginNextTask = 0;
+                Task nextTask = Task.makeDefault();
                 for(Task task : childState.tasks) {
                     Context context = getApplicationContext();
                     Intent alarmReceiverIntent = new Intent(context, AlarmNotificationReceiver.class);
@@ -49,8 +49,12 @@ public class AlarmService extends Service {
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(context, notificationId, alarmReceiverIntent, 0);
                     alarmMgr.cancel(alarmIntent);
 
-                    long triggerTime = makeTriggerTime(task, beginNextTask);
-                    if(triggerTime > System.currentTimeMillis()) {
+                    long triggerTime = makeTriggerTime(task, nextTask.begin);
+
+                    if(triggerTime == -1 ) {
+                        //alarmIntent.send(); no more warning for this task
+
+                    } else if(triggerTime > System.currentTimeMillis()) {
                         alarmMgr.set(
                             AlarmManager.RTC_WAKEUP,
                             triggerTime,
@@ -59,7 +63,7 @@ public class AlarmService extends Service {
                     }
 
                     notificationId++;
-                    beginNextTask = task.begin;
+                    nextTask = task;
                 }
             }
 
@@ -85,6 +89,7 @@ public class AlarmService extends Service {
             childActor.childStateBehavior,
             (__, childState) -> childState
         )
+        .distinctUntilChanged()
         .subscribe(childStateObserver);
 
         disposable.add(childStateObserver);
@@ -123,24 +128,27 @@ public class AlarmService extends Service {
 
     private long makeTriggerTime(Task task, long beginNextTask) {
         long trigger = task.begin + task.duration;
-        if (
-            beginNextTask - trigger
-            > TimeUnitEnum.MINUTES.toMilliseconds(5)
-        ) {
-//            childActor.warmParentForTask(task.name);
-            // No more reminder
-            childActor.removeReminderFor(task);
-        }
-        else if (task.reminder != null) {
+
+        if (task.reminder != null) {
             Log.d("SERVICE", task.reminder.displayedCount  + " / " +  task.reminder.count);
             if(task.reminder.displayedCount < task.reminder.count) {
                 trigger =
                     task.reminder.isBeforeTask
-                        ? task.begin - task.reminder.duration
-                        : task.begin + task.reminder.duration;
+                        ? task.begin - (task.reminder.count - task.reminder.displayedCount) * task.reminder.duration
+                        : task.begin + (task.reminder.count - task.reminder.displayedCount) * task.reminder.duration;
 
                 childActor.updateReminderDisplayedCount(task);
+                return trigger;
             }
+        }
+
+        if (
+            beginNextTask - trigger > TimeUnitEnum.MINUTES.toMilliseconds(5)
+            && !task.parentWarned
+        ) {
+            childActor.warnParentForTask(task.name, true);
+            childActor.removeReminderFor(task);
+            return -1;
         }
         return trigger;
     }

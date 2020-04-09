@@ -36,7 +36,7 @@ public class AlarmActionReceiver extends BroadcastReceiver {
             childActor.updateTaskAsDone(taskName);
         }
         else {
-            childActor.warmParentForTask(taskName);
+            childActor.warnParentForTask(taskName);
         }
     }
 

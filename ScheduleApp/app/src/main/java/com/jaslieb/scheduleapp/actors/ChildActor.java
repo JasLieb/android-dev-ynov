@@ -72,7 +72,17 @@ public class ChildActor{
             });
     }
 
-    public void warmParentForTask(String name) {
+    public void warnParentForTask(Task task, boolean setParentWarned) {
+        sendSMS(task.name);
+        updateParentWarned(task.name, setParentWarned);
+    }
+
+    public void warnParentForTask(String name) {
+        sendSMS(name);
+        updateParentWarned(name, false);
+    }
+
+    private void sendSMS(String name) {
         SmsManager manager = SmsManager.getDefault();
         manager.sendTextMessage(
             "0609580401",
@@ -81,5 +91,15 @@ public class ChildActor{
             null,
             null
         );
+    }
+
+    private void updateParentWarned(String name, boolean value) {
+        tasks.whereEqualTo("name", name)
+            .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                assert queryDocumentSnapshots != null;
+                for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    doc.getReference().update("parentWarned",  value);
+                }
+            });
     }
 }

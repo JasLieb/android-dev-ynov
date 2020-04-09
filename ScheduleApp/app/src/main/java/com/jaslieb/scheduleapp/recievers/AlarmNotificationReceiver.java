@@ -20,7 +20,8 @@ public class AlarmNotificationReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            // set alarm here
+//            Intent serviceIntent = new Intent(context, AlarmService.class);
+//            context.startService(serviceIntent);
         }
 
         String channelId ="ScheduleAppNotification";

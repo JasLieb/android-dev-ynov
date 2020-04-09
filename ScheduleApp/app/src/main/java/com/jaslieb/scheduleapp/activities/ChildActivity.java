@@ -1,5 +1,6 @@
 package com.jaslieb.scheduleapp.activities;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -45,11 +46,6 @@ public class ChildActivity extends AppCompatActivity {
 
         childActor = new ChildActor();
 
-        if(!AlarmService.isRunning) {
-            Intent intent = new Intent(this, AlarmService.class);
-            startService(intent);
-        }
-
         tasksAdapter = new ChildTasksAdapter(this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView taskList = findViewById(R.id.lvTasks);
@@ -59,12 +55,26 @@ public class ChildActivity extends AppCompatActivity {
 
         taskList.setLayoutManager(layoutManager);
         taskList.setAdapter(tasksAdapter);
+
+        NotificationManager nMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        assert nMgr != null;
+        nMgr.cancelAll();
+    }
+
+    @Override
+    protected void onStop() {
+        if(!AlarmService.isRunning) {
+            Intent intent = new Intent(this, AlarmService.class);
+            startService(intent);
+        } else {
+            AlarmService.makeNotificationStream.onNext(0);
+        }
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
     }
 
     public void warmParentForTask(String name) {

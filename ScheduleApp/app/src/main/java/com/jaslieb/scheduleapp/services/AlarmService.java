@@ -18,11 +18,15 @@ import com.jaslieb.scheduleapp.recievers.AlarmNotificationReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class AlarmService extends Service {
     public static boolean isRunning = false;
+    public static PublishSubject<Integer> makeNotificationStream = PublishSubject.create();
+
 
     private CompositeDisposable disposable = new CompositeDisposable();
     private DisposableObserver<ChildState> childStateObserver =
@@ -74,21 +78,28 @@ public class AlarmService extends Service {
         alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         ChildActor childActor = new ChildActor();
-        childActor.childStateBehavior.subscribe(childStateObserver);
+
+        Observable.combineLatest(
+            AlarmService.makeNotificationStream,
+            childActor.childStateBehavior,
+            (__, childState) -> childState
+        )
+        .subscribe(childStateObserver);
+
         disposable.add(childStateObserver);
 
-        ComponentName receiverTrigger = new ComponentName(context, AlarmNotificationReceiver.class);
-        ComponentName receiverAction = new ComponentName(context, AlarmActionReceiver.class);
+        AlarmService.makeNotificationStream.onNext(0);
+
         PackageManager pm = context.getPackageManager();
 
         pm.setComponentEnabledSetting(
-            receiverTrigger,
+            new ComponentName(context, AlarmNotificationReceiver.class),
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         );
 
         pm.setComponentEnabledSetting(
-            receiverAction,
+            new ComponentName(context, AlarmActionReceiver.class),
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         );

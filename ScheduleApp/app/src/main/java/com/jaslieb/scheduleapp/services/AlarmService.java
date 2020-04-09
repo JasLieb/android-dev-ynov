@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.recievers.AlarmActionReceiver;
-import com.jaslieb.scheduleapp.recievers.AlarmTriggerReceiver;
+import com.jaslieb.scheduleapp.recievers.AlarmNotificationReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -33,7 +33,7 @@ public class AlarmService extends Service {
                 int notificationId = 0;
                 for(Task task : childState.tasks) {
                     Context context = getApplicationContext();
-                    Intent alarmReceiverIntent = new Intent(context, AlarmTriggerReceiver.class);
+                    Intent alarmReceiverIntent = new Intent(context, AlarmNotificationReceiver.class);
                     alarmReceiverIntent.putExtra("task_name", task.name);
 
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(context, notificationId, alarmReceiverIntent, 0);
@@ -77,7 +77,7 @@ public class AlarmService extends Service {
         childActor.childStateBehavior.subscribe(childStateObserver);
         disposable.add(childStateObserver);
 
-        ComponentName receiverTrigger = new ComponentName(context, AlarmTriggerReceiver.class);
+        ComponentName receiverTrigger = new ComponentName(context, AlarmNotificationReceiver.class);
         ComponentName receiverAction = new ComponentName(context, AlarmActionReceiver.class);
         PackageManager pm = context.getPackageManager();
 

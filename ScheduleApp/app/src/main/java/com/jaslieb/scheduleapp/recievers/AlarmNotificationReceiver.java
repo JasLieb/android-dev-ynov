@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.jaslieb.scheduleapp.R;
 
-public class AlarmTriggerReceiver extends BroadcastReceiver{
+public class AlarmNotificationReceiver extends BroadcastReceiver{
 
     private static int counter = 0;
 
@@ -32,7 +32,7 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
                 new NotificationChannel(
                     channelId,
                     "alarm notification",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
                 );
 
             channel.enableLights(true);
@@ -67,7 +67,7 @@ public class AlarmTriggerReceiver extends BroadcastReceiver{
             new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_alarm_black_24dp)
                 .setContentTitle(taskName + " is finished ?")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(piAlarmReceiver)
                 .addAction(
                     0,

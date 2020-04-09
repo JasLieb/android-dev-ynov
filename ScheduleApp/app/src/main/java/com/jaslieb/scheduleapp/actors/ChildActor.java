@@ -15,10 +15,16 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class ChildActor{
 
+    private static ChildActor actor = null;
+    public static ChildActor getInstance() {
+        if(actor == null) actor = new ChildActor();
+        return actor;
+    }
+
     private CollectionReference tasks;
     public BehaviorSubject<ChildState> childStateBehavior;
 
-    public ChildActor() {
+    private ChildActor() {
         childStateBehavior = BehaviorSubject.createDefault(ChildState.Default);
 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -57,7 +63,7 @@ public class ChildActor{
             .addSnapshotListener((queryDocumentSnapshots, e) -> {
                 assert queryDocumentSnapshots != null;
                 for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                    doc.getReference().update("reminder.displayedCount",  task.reminder.displayedCount++);
+                    doc.getReference().update("reminder.displayedCount",  (task.reminder.displayedCount + 1));
                 }
             });
     }

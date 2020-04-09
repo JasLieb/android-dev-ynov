@@ -1,5 +1,6 @@
 package com.jaslieb.scheduleapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +22,7 @@ import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.actors.ParentActor;
+import com.jaslieb.scheduleapp.services.AlarmService;
 import com.jaslieb.scheduleapp.states.ParentState;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 
@@ -163,6 +165,12 @@ public class ParentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if(AlarmService.isRunning) {
+            Intent intent = new Intent(this, AlarmService.class);
+            stopService(intent);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent);
 

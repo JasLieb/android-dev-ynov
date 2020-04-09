@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.jaslieb.scheduleapp.MainActivity;
+import com.jaslieb.scheduleapp.activities.ChildActivity;
 import com.jaslieb.scheduleapp.actors.ChildActor;
 
 public class AlarmActionReceiver extends BroadcastReceiver {
@@ -30,7 +31,7 @@ public class AlarmActionReceiver extends BroadcastReceiver {
 
         String taskName = intent.getStringExtra("task_name");
         notificationManager.cancel(intent.getIntExtra("notification_id", -1));
-        ChildActor childActor = new ChildActor();
+        ChildActor childActor = ChildActor.getInstance();
 
         if (isDone) {
             childActor.updateTaskAsDone(taskName);
@@ -41,7 +42,7 @@ public class AlarmActionReceiver extends BroadcastReceiver {
     }
 
     private void startMainActivity(Context context) {
-        Intent i = new Intent(context, MainActivity.class);
+        Intent i = new Intent(context, ChildActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
     }

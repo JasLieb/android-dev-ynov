@@ -42,16 +42,22 @@ public class ChildActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if(AlarmService.isRunning) {
+            Intent intent = new Intent(this, AlarmService.class);
+            stopService(intent);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child);
 
-        childActor = new ChildActor();
+        childActor = ChildActor.getInstance();
 
         tasksAdapter = new ChildTasksAdapter(this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView taskList = findViewById(R.id.lvTasks);
 
-        childActor.childStateBehavior.subscribe(childStateObserver);
+        childActor.childStateBehavior.distinctUntilChanged().subscribe(childStateObserver);
         disposable.add(childStateObserver);
 
         taskList.setLayoutManager(layoutManager);

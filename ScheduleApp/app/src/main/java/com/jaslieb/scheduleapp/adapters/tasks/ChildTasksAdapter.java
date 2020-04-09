@@ -128,21 +128,21 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
             reminder.count > 1 ? "s" : "",
             TimeUnitEnum.fromMilliseconds(reminder.duration),
             reminder.isBeforeTask ? "before" : "after",
-            calcFirstReminder(task.begin, reminder)
+            calcFirstReminder(task)
         );
     }
 
-    private String calcFirstReminder(long begin, Reminder reminder) {
-        if (reminder.isBeforeTask) {
+    private String calcFirstReminder(Task task) {
+        if (task.reminder.isBeforeTask) {
             return
                 DateUtil.formatToDateString(
-                    begin - reminder.count * reminder.duration)
-                ;
+                    task.begin - task.reminder.count * task.reminder.duration
+                );
         } else {
             return
                 DateUtil.formatToDateString(
-                    begin - reminder.count * reminder.duration)
-                ;
+                    task.begin + task.duration + task.reminder.duration
+                );
         }
     }
 

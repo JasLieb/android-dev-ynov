@@ -53,7 +53,7 @@ public class ChildActor{
             );
         });
     }
-    
+
     public void updateTaskAsDone(String name) {
         tasks.whereEqualTo("name", name)
             .addSnapshotListener((queryDocumentSnapshots, e) -> {

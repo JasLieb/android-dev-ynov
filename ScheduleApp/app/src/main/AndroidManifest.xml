@@ -27,20 +27,27 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service android:name=".services.AlarmService" />
-        <receiver android:name=".receivers.AlarmNotificationReceiver">
+        <receiver
+            android:name=".receivers.AlarmNotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.AlarmActionReceiver">
+        <receiver
+            android:name=".receivers.AlarmActionReceiver"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT"/>
             </intent-filter>
         </receiver>
     </application>

@@ -58,26 +58,6 @@ public class AlarmService extends Service {
         return Service.START_STICKY;
     }
 
-    private void setAlarmForTasks(Context context, List<Task> tasks) {
-        tasks.sort(
-            (sA, sB) -> Long.compare(sB.begin, sA.begin)
-        );
-
-        Task nextTask = Task.makeDefault();
-        NotificationId = 0;
-        for(Task task : tasks) {
-            setAlarmForTask(context, task);
-            if ( task.reminder != null ) {
-                setAlarmForReminder(context, task, nextTask.begin);
-            }
-
-            if ( task.recurrence != null ) {
-                //setAlarmForRecurrence(task);
-            }
-            nextTask = task;
-        }
-    }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -88,6 +68,23 @@ public class AlarmService extends Service {
     public void onDestroy() {
         AlarmService.isRunning = false;
         super.onDestroy();
+    }
+
+    private void setAlarmForTasks(Context context, List<Task> tasks) {
+        tasks.sort(
+                (sA, sB) -> Long.compare(sB.begin, sA.begin)
+        );
+
+        Task nextTask = Task.makeDefault();
+        NotificationId = 0;
+        for(Task task : tasks) {
+            setAlarmForTask(context, task);
+            if ( task.reminder != null ) {
+                setAlarmForReminder(context, task, nextTask.begin);
+            }
+
+            nextTask = task;
+        }
     }
 
     private void setAlarm(Context context, String taskName, long triggerTime) {

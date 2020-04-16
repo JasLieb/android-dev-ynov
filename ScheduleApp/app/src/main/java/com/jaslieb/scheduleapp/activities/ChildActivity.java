@@ -73,8 +73,6 @@ public class ChildActivity extends AppCompatActivity {
         if(!AlarmService.isRunning) {
             Intent intent = new Intent(this, AlarmService.class);
             startService(intent);
-        } else {
-            AlarmService.makeNotificationStream.onNext(0);
         }
         super.onStop();
     }
@@ -85,7 +83,7 @@ public class ChildActivity extends AppCompatActivity {
     }
 
     public void warmParentForTask(Task task) {
-        childActor.warnParentForTask(task, false);
+        childActor.warnParentForTask(task.name);
     }
 
     public void updateTaskAsDone(String name) {

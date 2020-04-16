@@ -144,17 +144,16 @@ public class ParentActivity extends AppCompatActivity {
         Reminder reminder = null;
         if(hasReminder) {
              reminder = new Reminder(
-                spTaskReminderBeAf.getSelectedItem().toString() == "Before",
-                Integer.parseInt(etTaskCountReminder.getText().toString()),
+                 spTaskReminderBeAf.getSelectedItem().toString().equals("Before"),
+                 Integer.parseInt(etTaskCountReminder.getText().toString()),
                  TimeUnitEnum.find(
                      spTaskReminderTU
                          .getSelectedItem()
-                         .toString()
+                        .toString()
                  )
                  .toMilliseconds(
-                     etTaskReminderValue.getText().toString()
-                 ),
-                 0
+                    etTaskReminderValue.getText().toString()
+                 )
             );
         }
 

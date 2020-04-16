@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -43,6 +44,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver{
         }
 
         String taskName = intent.getStringExtra("task_name");
+        Log.d("ALARM NOTIFICATION", "TASK NAME : " + taskName);
         assert taskName != null;
 
         notificationManager.notify(

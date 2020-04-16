@@ -58,16 +58,6 @@ public class ChildActor{
             });
     }
 
-    public void updateReminderDisplayedCount(Task task) {
-        tasks.whereEqualTo("name", task.name)
-            .addSnapshotListener((queryDocumentSnapshots, e) -> {
-                assert queryDocumentSnapshots != null;
-                for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                    doc.getReference().update("reminder.displayedCount",  (task.reminder.displayedCount + 1));
-                }
-            });
-    }
-
     public void removeReminderFor(Task task) {
         tasks.whereEqualTo("name", task.name)
             .addSnapshotListener((queryDocumentSnapshots, e) -> {
@@ -78,14 +68,9 @@ public class ChildActor{
             });
     }
 
-    public void warnParentForTask(Task task, boolean setParentWarned) {
-        sendSMS(task.name);
-        updateParentWarned(task.name, setParentWarned);
-    }
-
     public void warnParentForTask(String name) {
         sendSMS(name);
-        updateParentWarned(name, false);
+        updateParentWarned(name);
     }
 
     private void sendSMS(String name) {
@@ -99,12 +84,12 @@ public class ChildActor{
         );
     }
 
-    private void updateParentWarned(String name, boolean value) {
+    private void updateParentWarned(String name) {
         tasks.whereEqualTo("name", name)
             .addSnapshotListener((queryDocumentSnapshots, e) -> {
                 assert queryDocumentSnapshots != null;
                 for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                    doc.getReference().update("parentWarned",  value);
+                    doc.getReference().update("parentWarned",  true);
                 }
             });
     }

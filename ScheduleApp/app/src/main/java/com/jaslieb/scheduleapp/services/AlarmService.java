@@ -21,65 +21,14 @@ import com.jaslieb.scheduleapp.receivers.AlarmNotificationReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
-import io.reactivex.rxjava3.subjects.PublishSubject;
+import java.util.List;
 
 public class AlarmService extends Service {
     public static boolean isRunning = false;
-    public static PublishSubject<Integer> makeNotificationStream = PublishSubject.create();
+    private static int NotificationId = 0;
 
     private AlarmManager alarmMgr;
     private ChildActor childActor;
-
-    private CompositeDisposable disposable = new CompositeDisposable();
-    private DisposableObserver<ChildState> childStateObserver =
-        new DisposableObserver<ChildState>() {
-            @Override
-            public void onNext(@NonNull ChildState childState) {
-                childState.tasks.sort(
-                    (sA, sB) -> Long.compare(sB.begin, sA.begin)
-                );
-
-                Task nextTask = Task.makeDefault();
-                int notificationId = 0;
-
-                for(Task task : childState.tasks) {
-                    Context context = getApplicationContext();
-                    Intent alarmReceiverIntent = new Intent(context, AlarmNotificationReceiver.class);
-                    alarmReceiverIntent.putExtra("task_name", task.name);
-
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(context, notificationId, alarmReceiverIntent, 0);
-
-                    long triggerTime = makeTriggerTime(task, nextTask.begin);
-
-                    if (triggerTime > 0 ) {
-                        Log.d("SERVICE", "ADD ALARM FOR " + task.name);
-                        Log.d("SERVICE", "RING ALARM AT " + DateUtil.formatToDateString(triggerTime));
-                        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerTime, alarmIntent);
-                    }
-
-                    if(triggerTime == -3)  {
-                        childActor.warnParentForTask(task, true);
-                    }
-
-                    // TODO
-                    // triggerTime == -1 ==>  alarmIntent.send(); no more warning for this task
-                    // triggerTime == -2 ==>  Parent already warned, so say that to the child
-
-                    notificationId++;
-                    nextTask = task;
-                }
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {}
-
-            @Override
-            public void onComplete() {}
-        };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -89,17 +38,8 @@ public class AlarmService extends Service {
         alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         childActor = ChildActor.getInstance();
 
-        Observable.combineLatest(
-            AlarmService.makeNotificationStream,
-            childActor.childStateBehavior,
-            (__, childState) -> childState
-        )
-        .distinctUntilChanged()
-        .subscribe(childStateObserver);
-
-        disposable.add(childStateObserver);
-
-        AlarmService.makeNotificationStream.onNext(0);
+        ChildState childState = childActor.childStateBehavior.getValue();
+        setAlarmForTasks(context, childState.tasks);
 
         PackageManager pm = context.getPackageManager();
 
@@ -118,6 +58,26 @@ public class AlarmService extends Service {
         return Service.START_STICKY;
     }
 
+    private void setAlarmForTasks(Context context, List<Task> tasks) {
+        tasks.sort(
+            (sA, sB) -> Long.compare(sB.begin, sA.begin)
+        );
+
+        Task nextTask = Task.makeDefault();
+        NotificationId = 0;
+        for(Task task : tasks) {
+            setAlarmForTask(context, task);
+            if ( task.reminder != null ) {
+                setAlarmForReminder(context, task, nextTask.begin);
+            }
+
+            if ( task.recurrence != null ) {
+                //setAlarmForRecurrence(task);
+            }
+            nextTask = task;
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -127,46 +87,87 @@ public class AlarmService extends Service {
     @Override
     public void onDestroy() {
         AlarmService.isRunning = false;
-        disposable.dispose();
         super.onDestroy();
     }
 
-    private long makeTriggerTime(Task task, long beginNextTask) {
+    private void setAlarm(Context context, String taskName, long triggerTime) {
+        Intent alarmReceiverIntent = new Intent(context, AlarmNotificationReceiver.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, NotificationId, alarmReceiverIntent, 0);
+        context.sendBroadcast(alarmReceiverIntent.putExtra("task_name", taskName));
+        if (triggerTime > 0 ) {
+            Log.d("SERVICE", "ADD ALARM FOR " + taskName);
+            Log.d("SERVICE", "RING ALARM AT " + DateUtil.formatToDateString(triggerTime));
+            alarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerTime, alarmIntent);
+            NotificationId++;
+        }
+    }
+
+    private void setAlarmForTask(Context context, Task task) {
+        long triggerTime = makeTriggerTime(task);
+
+        if(triggerTime == -2)  {
+            childActor.warnParentForTask(task.name);
+        } else {
+            setAlarm(context, task.name, triggerTime);
+        }
+
+        // TODO
+        // triggerTime == -1 ==>  Parent already warned, so say that to the child
+
+    }
+
+    private long makeTriggerTime(Task task) {
         if(task.parentWarned) {
-            return -2; // -2 == Parent already warned, so skip
+            return -1;
         }
 
-        long begin = task.begin, duration = task.duration, currentTime = System.currentTimeMillis();
-        long trigger = begin + duration;
+        long trigger = task.begin + task.duration, currentTime = System.currentTimeMillis();
         boolean isBeforeTrigger = currentTime < trigger;
-        Reminder reminder = task.reminder;
-
-        if ( reminder != null ) {
-           if (reminder.isBeforeTask && isBeforeTrigger) {
-               return begin - (reminder.count - reminder.displayedCount) * reminder.duration;
-           } else if (!reminder.isBeforeTask && !isBeforeTrigger) {
-               for (int i = 0; i < reminder.count; i++) {
-                   if (currentTime < trigger + i * reminder.duration) {
-                       if(
-                           beginNextTask > 0 &&
-                           beginNextTask - currentTime < TimeUnitEnum.MINUTES.toMilliseconds(5)
-                       ) {
-                           Log.d("SERVICE", "NO TIME ANYMORE FOR " + task.name);
-                           childActor.warnParentForTask(task, true);
-                           childActor.removeReminderFor(task);
-                           return -1; // -1 == No time anymore, next task will begin
-                       }
-                       Log.d("SERVICE", "REMINDER AFTER AT " + DateUtil.formatToDateString(trigger + i * reminder.duration));
-                       return trigger + i * reminder.duration;
-                   }
-               }
-           }
-        }
 
         if(!isBeforeTrigger) {
-            return -3; // After task's end but parent aren't warned
+            return -2;
         }
 
-        return trigger; // Else return task end
+        return trigger;
+    }
+
+    private void setAlarmForReminder(Context context, Task task, long beginNextTask) {
+        Log.d("SERVICE", "REMINDER PRESENT IN " + task.name);
+        long begin = task.begin,
+            duration = task.duration,
+            trigger = begin + duration,
+            currentTime = System.currentTimeMillis();
+        Reminder reminder = task.reminder;
+
+        if (reminder.isBeforeTask) {
+            for(int i = reminder.count - 1; i >= 0; i--) {
+                trigger = begin - (reminder.count - i) * reminder.duration;
+                if(trigger > currentTime) {
+                    Log.d("SERVICE", "BEFORE : " +  i + " : TRIGGER AT " + DateUtil.formatToDateString(trigger));
+                    Log.d("SERVICE", "WARNING BEFORE BEGIN " + task.name);
+                    setAlarm(context, task.name, trigger);
+                }
+            }
+        } else {
+            for (int i = 0; i < reminder.count; i++) {
+                trigger = trigger + (reminder.count - i)  * reminder.duration;
+                Log.d("SERVICE", "AFTER : " +  i + " : TRIGGER AT " + DateUtil.formatToDateString(trigger));
+                if (currentTime < trigger) {
+                    Log.d("SERVICE", "AFTER : " +  i + " : TRIGGER NEXT TASK AT " + DateUtil.formatToDateString(beginNextTask));
+                    Log.d("SERVICE", "AFTER : " +  i + " : TRIGGER NEXT TASK AT " + DateUtil.formatToDateString(beginNextTask - currentTime));
+                    if(
+                        beginNextTask > 0 &&
+                        beginNextTask - trigger < TimeUnitEnum.MINUTES.toMilliseconds(5)
+                    ) {
+                        Log.d("SERVICE", "NO TIME ANYMORE FOR " + task.name);
+                        childActor.warnParentForTask(task.name);
+                        childActor.removeReminderFor(task);
+                        break;
+                    }
+                    Log.d("SERVICE", "REMINDER AFTER AT " + DateUtil.formatToDateString(trigger));
+                    setAlarm(context, task.name, trigger);
+                }
+            }
+        }
     }
 }

@@ -1,11 +1,10 @@
-package com.jaslieb.scheduleapp.recievers;
+package com.jaslieb.scheduleapp.receivers;
 
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.jaslieb.scheduleapp.MainActivity;
 import com.jaslieb.scheduleapp.activities.ChildActivity;
 import com.jaslieb.scheduleapp.actors.ChildActor;
 

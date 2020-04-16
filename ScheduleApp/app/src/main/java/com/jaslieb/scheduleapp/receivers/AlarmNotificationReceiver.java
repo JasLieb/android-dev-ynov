@@ -1,4 +1,4 @@
-package com.jaslieb.scheduleapp.recievers;
+package com.jaslieb.scheduleapp.receivers;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

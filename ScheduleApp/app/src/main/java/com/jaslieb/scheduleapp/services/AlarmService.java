@@ -16,12 +16,10 @@ import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-import com.jaslieb.scheduleapp.recievers.AlarmActionReceiver;
-import com.jaslieb.scheduleapp.recievers.AlarmNotificationReceiver;
+import com.jaslieb.scheduleapp.receivers.AlarmActionReceiver;
+import com.jaslieb.scheduleapp.receivers.AlarmNotificationReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 import com.jaslieb.scheduleapp.utils.DateUtil;
-
-import java.util.ArrayList;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;

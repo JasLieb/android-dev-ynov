@@ -1,12 +1,18 @@
 package com.jaslieb.scheduleapp.actors;
 
 import android.telephony.SmsManager;
+import android.util.Log;
 
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
+import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.states.ChildState;
+import com.jaslieb.scheduleapp.utils.DateUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,13 +53,28 @@ public class ChildActor{
             );
         });
     }
-
+    
     public void updateTaskAsDone(String name) {
         tasks.whereEqualTo("name", name)
             .addSnapshotListener((queryDocumentSnapshots, e) -> {
                 assert queryDocumentSnapshots != null;
                 for(DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                    doc.getReference().delete();
+                    DocumentReference ref = doc.getReference();
+                    ref.get().addOnSuccessListener(taskDoc -> {
+                        String recurrenceString = taskDoc.getString("recurrence");
+                        if(recurrenceString != null && !recurrenceString.equals("null")) {
+                            long begin = (long) taskDoc.get("begin");
+                            Log.d("CHILD ACTOR", "BEGIN AT " + DateUtil.formatToDateString(begin) + " RECURRENCE : " + TimeUnitEnum.find(recurrenceString).name());
+                            Log.d("CHILD ACTOR", "CURRENT AT " + DateUtil.formatToDateString(System.currentTimeMillis()));
+                            if(System.currentTimeMillis() > begin) {
+                                begin += TimeUnitEnum.find(recurrenceString).toMilliseconds(1);
+                                Log.d("CHILD ACTOR", "NEW BEGIN AT " + DateUtil.formatToDateString(begin));
+                                ref.update( "begin", begin);
+                            }
+                        } else {
+                            ref.delete();
+                        }
+                    });
                 }
             });
     }

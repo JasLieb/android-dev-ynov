@@ -1,66 +1,64 @@
-package com.jaslieb.scheduleapp.receivers;
+package com.jaslieb.scheduleapp.jobs;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import com.jaslieb.scheduleapp.MainActivity;
 import com.jaslieb.scheduleapp.R;
+import com.jaslieb.scheduleapp.receivers.AlarmActionReceiver;
 
-public class AlarmNotificationReceiver extends BroadcastReceiver{
-
+public class NotificationJob extends JobService {
     private static int counter = 0;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        if(action != null)
-            Log.d("ALARM NOTIFICATION", "INTENT ACTION : " + action);
-        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            Log.d("ALARM NOTIFICATION", "BOOT COMPLETED");
-            Intent serviceIntent = new Intent(context, MainActivity.class);
-            context.startActivity(serviceIntent);
-        } else {
-            String channelId ="ScheduleAppNotification";
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            assert notificationManager != null;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                NotificationChannel channel =
-                    new NotificationChannel(
-                        channelId,
-                        "alarm notification",
-                        NotificationManager.IMPORTANCE_HIGH
-                    );
-
-                channel.enableLights(true);
-                channel.enableVibration(true);
-
-                notificationManager.createNotificationChannel(channel);
-            }
-
-            String taskName = intent.getStringExtra("task_name");
-            Log.d("ALARM NOTIFICATION", "TASK NAME : " + taskName);
-            assert taskName != null;
-
-            notificationManager.notify(
-                counter,
-                makeNotification(
-                    context,
+    public boolean onStartJob(JobParameters params) {
+        Context context = getApplicationContext();
+        String channelId ="ScheduleAppNotification";
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notificationManager != null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel =
+                new NotificationChannel(
                     channelId,
-                    taskName
-                )
-            );
-            counter++;
+                    "alarm notification",
+                    NotificationManager.IMPORTANCE_HIGH
+                );
+
+            channel.enableLights(true);
+            channel.enableVibration(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            notificationManager.createNotificationChannel(channel);
         }
+
+        String taskName = params.getExtras().getString("task_name");
+        Log.d("ALARM NOTIFICATION", "TASK NAME : " + taskName);
+        assert taskName != null;
+
+        notificationManager.notify(
+            counter,
+            makeNotification(
+                context,
+                channelId,
+                taskName
+            )
+        );
+        counter++;
+        return true;
+    }
+
+    @Override
+    public boolean onStopJob(JobParameters params) {
+        return true;
     }
 
     private Notification makeNotification(
@@ -109,8 +107,8 @@ public class AlarmNotificationReceiver extends BroadcastReceiver{
     private Intent intentWithAction(Intent intent, int notificationId, String taskName, boolean isDone) {
         intent.setAction(
             isDone
-            ? "done"
-            : "not_yet"
+                ? "done"
+                : "not_yet"
         );
 
         intent.putExtra("task_name", taskName);

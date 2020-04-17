@@ -1,23 +1,22 @@
 package com.jaslieb.scheduleapp.services;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.jaslieb.scheduleapp.actors.ChildActor;
+import com.jaslieb.scheduleapp.jobs.NotificationJob;
 import com.jaslieb.scheduleapp.models.Reminder;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-import com.jaslieb.scheduleapp.receivers.AlarmActionReceiver;
-import com.jaslieb.scheduleapp.receivers.AlarmNotificationReceiver;
 import com.jaslieb.scheduleapp.states.ChildState;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 
@@ -27,7 +26,7 @@ public class AlarmService extends Service {
     public static boolean isRunning = false;
     private static int NotificationId = 0;
 
-    private AlarmManager alarmMgr;
+    private JobScheduler jobScheduler;
     private ChildActor childActor;
 
     @Override
@@ -35,27 +34,15 @@ public class AlarmService extends Service {
         AlarmService.isRunning = true;
         Context context = getApplicationContext();
 
-        alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.cancelAll();
+
         childActor = ChildActor.getInstance();
-
         ChildState childState = childActor.childStateBehavior.getValue();
+
         setAlarmForTasks(context, childState.tasks);
-
-        PackageManager pm = context.getPackageManager();
-
-        pm.setComponentEnabledSetting(
-            new ComponentName(context, AlarmNotificationReceiver.class),
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        );
-
-        pm.setComponentEnabledSetting(
-            new ComponentName(context, AlarmActionReceiver.class),
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        );
-
-        return Service.START_STICKY;
+//        stopSelf();
+        return Service.START_REDELIVER_INTENT;
     }
 
     @Nullable
@@ -72,7 +59,7 @@ public class AlarmService extends Service {
 
     private void setAlarmForTasks(Context context, List<Task> tasks) {
         tasks.sort(
-                (sA, sB) -> Long.compare(sB.begin, sA.begin)
+            (sA, sB) -> Long.compare(sB.begin, sA.begin)
         );
 
         Task nextTask = Task.makeDefault();
@@ -88,13 +75,24 @@ public class AlarmService extends Service {
     }
 
     private void setAlarm(Context context, String taskName, long triggerTime) {
-        Intent alarmReceiverIntent = new Intent(context, AlarmNotificationReceiver.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, NotificationId, alarmReceiverIntent, 0);
-        context.sendBroadcast(alarmReceiverIntent.putExtra("task_name", taskName));
         if (triggerTime > 0 ) {
             Log.d("SERVICE", "ADD ALARM FOR " + taskName);
             Log.d("SERVICE", "RING ALARM AT " + DateUtil.formatToDateString(triggerTime));
-            alarmMgr.setExact(AlarmManager.RTC_WAKEUP, triggerTime, alarmIntent);
+            Log.d("SERVICE", "CURRENT TIME " + DateUtil.formatToDateString(System.currentTimeMillis()));
+            PersistableBundle extras = new PersistableBundle();
+            extras.putString("task_name", taskName);
+
+            jobScheduler.schedule(
+                new JobInfo.Builder(NotificationId, new ComponentName(context, NotificationJob.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setExtras(extras)
+                    .setMinimumLatency( triggerTime - System.currentTimeMillis() - 5000)
+                    .setOverrideDeadline(triggerTime)
+                    .setRequiresDeviceIdle(false)
+                    .setRequiresCharging(false)
+                    .setPersisted(true)
+                    .build()
+            );
             NotificationId++;
         }
     }
@@ -132,6 +130,7 @@ public class AlarmService extends Service {
         Log.d("SERVICE", "REMINDER PRESENT IN " + task.name);
         long begin = task.begin,
             duration = task.duration,
+            baseTrigger = begin + duration,
             trigger = begin + duration,
             currentTime = System.currentTimeMillis();
         Reminder reminder = task.reminder;
@@ -146,15 +145,16 @@ public class AlarmService extends Service {
                 }
             }
         } else {
-            for (int i = 0; i < reminder.count; i++) {
+            for (int i = reminder.count -1 ; i >= 0; i--) {
                 trigger = trigger + (reminder.count - i)  * reminder.duration;
                 Log.d("SERVICE", "AFTER : " +  i + " : TRIGGER AT " + DateUtil.formatToDateString(trigger));
                 if (currentTime < trigger) {
                     Log.d("SERVICE", "AFTER : " +  i + " : TRIGGER NEXT TASK AT " + DateUtil.formatToDateString(beginNextTask));
                     Log.d("SERVICE", "AFTER : " +  i + " : TRIGGER NEXT TASK AT " + DateUtil.formatToDateString(beginNextTask - currentTime));
                     if(
-                        beginNextTask > 0 &&
-                        beginNextTask - trigger < TimeUnitEnum.MINUTES.toMilliseconds(5)
+                        beginNextTask > 0
+                        && beginNextTask - trigger < TimeUnitEnum.MINUTES.toMilliseconds(5)
+                        && System.currentTimeMillis() > baseTrigger
                     ) {
                         Log.d("SERVICE", "NO TIME ANYMORE FOR " + task.name);
                         childActor.warnParentForTask(task.name);

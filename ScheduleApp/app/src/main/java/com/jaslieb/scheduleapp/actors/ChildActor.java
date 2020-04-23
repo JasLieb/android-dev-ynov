@@ -59,23 +59,35 @@ public class ChildActor{
                     ref.get().addOnSuccessListener(taskDoc -> {
                         String recurrenceString = taskDoc.getString("recurrence");
                         if(recurrenceString != null && !recurrenceString.equals("null")) {
-                            long begin = (long) taskDoc.get("begin");
-                            long newBegin = begin + TimeUnitEnum.find(recurrenceString).toMilliseconds(1);
-                            long currentTime= System.currentTimeMillis();
-                            if(currentTime > begin && currentTime < newBegin ) {
-                                ref.update( "begin", newBegin);
-                                ref.update( "parentWarned", false);
-                                String reminderString = taskDoc.getString("reminder");
-                                if(reminderString != null && !reminderString.equals("null")) {
-                                    ref.update( "reminder.isTriggered", false);
-                                }
-                            }
+                            updateBeginFollowRecurrence(
+                                ref,
+                                taskDoc,
+                                TimeUnitEnum.find(recurrenceString).toMilliseconds(1)
+                            );
                         } else {
                             ref.delete();
                         }
                     });
                 }
             });
+    }
+
+    private void updateBeginFollowRecurrence(DocumentReference ref, DocumentSnapshot taskDoc, long recurrence) {
+        long begin = (long) taskDoc.get("begin");
+        long newBegin = begin + recurrence;
+        long currentTime= System.currentTimeMillis();
+
+        while( currentTime > newBegin ) {
+            newBegin += recurrence;
+        }
+
+        if(currentTime > begin && currentTime < newBegin ) {
+            ref.update( "begin", newBegin);
+            ref.update( "parentWarned", false);
+            if(taskDoc.get("reminder") != null ) {
+                ref.update( "reminder.isTriggered", false);
+            }
+        }
     }
 
     public void removeReminderFor(Task task) {

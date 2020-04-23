@@ -41,7 +41,6 @@ public class AlarmService extends Service {
         ChildState childState = childActor.childStateBehavior.getValue();
 
         setAlarmForTasks(context, childState.tasks);
-//        stopSelf();
         return Service.START_REDELIVER_INTENT;
     }
 
@@ -66,7 +65,7 @@ public class AlarmService extends Service {
         NotificationId = 0;
         for(Task task : tasks) {
             setAlarmForTask(context, task);
-            if ( task.reminder != null ) {
+            if ( task.reminder != null && !task.reminder.isTriggered ) {
                 setAlarmForReminder(context, task, nextTask.begin);
             }
 
@@ -101,6 +100,7 @@ public class AlarmService extends Service {
         long triggerTime = makeTriggerTime(task);
 
         if(triggerTime == -2)  {
+            Log.d("SERVICE", "NO REMINDER AND TIME PASS FOR " + task.name);
             childActor.warnParentForTask(task.name);
         } else {
             setAlarm(context, task.name, triggerTime);
@@ -119,7 +119,8 @@ public class AlarmService extends Service {
         long trigger = task.begin + task.duration, currentTime = System.currentTimeMillis();
         boolean isBeforeTrigger = currentTime < trigger;
 
-        if(!isBeforeTrigger) {
+        if(!isBeforeTrigger && task.reminder == null) {
+            Log.d("SERVICE", "NO REMINDER AND TIME PASS FOR " + task.name);
             return -2;
         }
 

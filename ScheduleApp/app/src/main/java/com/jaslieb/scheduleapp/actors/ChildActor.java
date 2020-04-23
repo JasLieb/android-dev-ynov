@@ -1,7 +1,6 @@
 package com.jaslieb.scheduleapp.actors;
 
 import android.telephony.SmsManager;
-import android.util.Log;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -10,7 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.jaslieb.scheduleapp.models.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.states.ChildState;
-import com.jaslieb.scheduleapp.utils.DateUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,11 +62,7 @@ public class ChildActor{
                             long begin = (long) taskDoc.get("begin");
                             long newBegin = begin + TimeUnitEnum.find(recurrenceString).toMilliseconds(1);
                             long currentTime= System.currentTimeMillis();
-                            Log.d("CHILD ACTOR", "RECURRENCE BEGIN AT " + DateUtil.formatToDateString(begin));
-                            Log.d("CHILD ACTOR", "RECURRENCE BEGIN AT " + DateUtil.formatToDateString(newBegin));
-                            Log.d("CHILD ACTOR", "RECURRENCE CURRENT TIME " + DateUtil.formatToDateString(System.currentTimeMillis()));
                             if(currentTime > begin && currentTime < newBegin ) {
-                                Log.d("CHILD ACTOR", "RECURRENCE UPDATE ");
                                 ref.update( "begin", newBegin);
                                 ref.update( "parentWarned", false);
                                 String reminderString = taskDoc.getString("reminder");

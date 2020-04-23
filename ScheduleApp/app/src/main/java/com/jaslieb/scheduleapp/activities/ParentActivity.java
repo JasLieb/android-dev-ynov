@@ -56,6 +56,9 @@ public class ParentActivity extends AppCompatActivity {
             public void onComplete() {}
         };
 
+    private Button btShowAddTask;
+    private LinearLayout llAddTask;
+
     private EditText etTaskName;
 
     private EditText etTimeValue;
@@ -161,6 +164,8 @@ public class ParentActivity extends AppCompatActivity {
         if(taskName.length() > 0) {
             service.addTask(taskName, beginTime, duration, type, recurrence, reminder);
         }
+
+        lostFocusOnEditText();
     };
 
     @Override
@@ -173,6 +178,16 @@ public class ParentActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent);
+
+        btShowAddTask = findViewById(R.id.btShowAddTask);;
+        btShowAddTask.setOnClickListener(v -> {
+            llAddTask.setVisibility(
+                    llAddTask.getVisibility() == View.VISIBLE
+                    ? View.GONE
+                    : View.VISIBLE
+            );
+        });
+        llAddTask = findViewById(R.id.llAddTask);
 
         etTaskName = findViewById(R.id.etTaskName);
 
@@ -193,6 +208,7 @@ public class ParentActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 checkEtValueAsTime(etTimeValue, TimeUnitEnum.find(position));
+                lostFocusOnEditText();
             }
 
             @Override
@@ -201,25 +217,31 @@ public class ParentActivity extends AppCompatActivity {
 
         tpTaskTimeBegin = findViewById(R.id.tpTaskTimeBegin);
         tpTaskTimeBegin.setOnTimeChangedListener(
-            (view, hourOfDay, minute) ->
-                updateSpTaskTU(spTaskRecurrenceTU, 2, getTaskBeginTime())
+            (view, hourOfDay, minute) -> {
+                updateSpTaskTU(spTaskRecurrenceTU, 2, getTaskBeginTime());
+                lostFocusOnEditText();
+            }
         );
 
         dpDateBegin = findViewById(R.id.dpDateBegin);
         dpDateBegin.setMinDate(System.currentTimeMillis());
         dpDateBegin.setOnDateChangedListener(
-            (view, year, monthOfYear, dayOfMonth) ->
-                updateSpTaskTU(spTaskRecurrenceTU, 2, getTaskBeginTime())
+            (view, year, monthOfYear, dayOfMonth) -> {
+                updateSpTaskTU(spTaskRecurrenceTU, 2, getTaskBeginTime());
+                lostFocusOnEditText();
+            }
         );
 
         llTaskRecurrence = findViewById(R.id.llTaskRecurrence);
 
         cbHaveRecurrence = findViewById(R.id.cbHaveRecurrence);
         cbHaveRecurrence.setOnCheckedChangeListener(
-            (buttonView, isChecked) ->
+            (buttonView, isChecked) -> {
                 llTaskRecurrence.setVisibility(
                     isChecked ? View.VISIBLE : View.GONE
-                )
+                );
+                lostFocusOnEditText();
+            }
         );
 
         spTaskRecurrenceTU = findViewById(R.id.spTaskRepeatTU);
@@ -230,8 +252,10 @@ public class ParentActivity extends AppCompatActivity {
         llTaskReminder = findViewById(R.id.llTaskReminder);
         cbHaveReminder = findViewById(R.id.cbHaveReminder);
         cbHaveReminder.setOnCheckedChangeListener(
-            (buttonView, isChecked) ->
-                llTaskReminder.setVisibility( isChecked ? View.VISIBLE : View.GONE)
+            (buttonView, isChecked) -> {
+                llTaskReminder.setVisibility( isChecked ? View.VISIBLE : View.GONE);
+                lostFocusOnEditText();
+            }
         );
 
         etTaskCountReminder = findViewById(R.id.etTaskCountReminder);
@@ -247,6 +271,7 @@ public class ParentActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 checkEtValueAsTime(etTaskReminderValue, TimeUnitEnum.find(position + 1));
+                lostFocusOnEditText();
             }
 
             @Override
@@ -275,6 +300,13 @@ public class ParentActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         disposable.dispose();
+    }
+
+    private void lostFocusOnEditText() {
+        etTaskName.clearFocus();
+        etTimeValue.clearFocus();
+        etTaskReminderValue.clearFocus();
+        etTaskCountReminder.clearFocus();
     }
 
     private void updateSpTaskTU(Spinner sp, int minPosition, long  taskBegin) {

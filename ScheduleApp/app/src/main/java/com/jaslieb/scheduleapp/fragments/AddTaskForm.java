@@ -150,12 +150,11 @@ public class AddTaskForm extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        parentActor = new ParentActor();
+        parentActor = ParentActor.getInstance();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_add_task_form, container, false);
         etTaskName = view.findViewById(R.id.etTaskName);
 
@@ -164,12 +163,12 @@ public class AddTaskForm extends Fragment {
 
         spTaskType = view.findViewById(R.id.spTaskType);
         spTaskType.setAdapter(
-                getTaskTypeAdapter()
+            getTaskTypeAdapter()
         );
 
         spTaskDurationTU = view.findViewById(R.id.spTimeUnit);
         spTaskDurationTU.setAdapter(
-                getTimeUnitAdapter()
+            getTimeUnitAdapter()
         );
 
         spTaskDurationTU.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

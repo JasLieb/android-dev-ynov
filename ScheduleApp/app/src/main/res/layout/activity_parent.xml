@@ -33,6 +33,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="0.9"
                     android:layout_gravity="center"
+                    android:gravity="center"
                     android:text="Add a new Task for CHILD_NAME"
                     android:textSize="20sp"/>
 
@@ -48,14 +49,57 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_marginTop="100dp">
 
                 <fragment android:name="com.jaslieb.scheduleapp.fragments.AddTaskForm"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/fgAddTasks" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:strokeColor="@color/stroke_color"
+            app:strokeWidth="1dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.9"
+                        android:gravity="center"
+                        android:text="See all tasks for CHILD_NAME"
+                        android:textSize="20sp"/>
+
+                    <Button
+                        android:id="@+id/btShowTaskChild"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5"
+                        android:drawableEnd="@drawable/ic_expand_more_black_24dp"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/lvTasks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toTopOf="parent" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

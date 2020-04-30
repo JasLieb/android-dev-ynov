@@ -5,72 +5,57 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
 import com.jaslieb.scheduleapp.R;
-import com.jaslieb.scheduleapp.activities.ChildActivity;
-import com.jaslieb.scheduleapp.adapters.tasks.viewHolders.ChildTaskViewHolder;
-import com.jaslieb.scheduleapp.models.Reminder;
+import com.jaslieb.scheduleapp.activities.ParentActivity;
+import com.jaslieb.scheduleapp.adapters.tasks.viewHolders.ParentTaskViewHolder;
 import com.jaslieb.scheduleapp.models.Task;
-import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-import com.jaslieb.scheduleapp.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChildTasksAdapter extends ListAdapter<Task, ChildTaskViewHolder> {
-    private ChildActivity childActivity;
+public class ParentTasksAdapter extends ListAdapter<Task, ParentTaskViewHolder> {
+    private ParentActivity parentActivity;
     private List<Task> tasks;
     private int lastPosition = -1;
 
     private static final DiffUtil.ItemCallback<Task> DIFF_CALLBACK =
         new DiffUtil.ItemCallback<Task>() {
             @Override
-            public boolean areItemsTheSame(
-                @NonNull Task oldTask,
-                @NonNull Task newTask
-            ) {
+            public boolean areItemsTheSame(@NonNull Task oldTask,@NonNull Task newTask) {
                 return false;
             }
             @Override
-            public boolean areContentsTheSame(
-                @NonNull Task oldTask,
-                @NonNull Task newTask
-            ) {
+            public boolean areContentsTheSame(@NonNull Task oldTask,@NonNull Task newTask) {
                 return false;
             }
         };
 
-    public ChildTasksAdapter(ChildActivity childActivity) {
+    public ParentTasksAdapter(ParentActivity parentActivity) {
         super(DIFF_CALLBACK);
-        this.childActivity = childActivity;
+        this.parentActivity = parentActivity;
         tasks = new ArrayList<>();
     }
 
     @NonNull
     @Override
-    public ChildTaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ChildTaskViewHolder(
-            childActivity,
+    public ParentTaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ParentTaskViewHolder(
             LayoutInflater
                 .from(parent.getContext())
                 .inflate(
-                    R.layout.list_task_row, parent,
+                    R.layout.list_parent_task_row, parent,
                     false
                 )
         );
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChildTaskViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ParentTaskViewHolder holder, int position) {
         if (getItemCount() >  0) {
             holder.bindTo(
                 getItem(position)
@@ -85,7 +70,7 @@ public class ChildTasksAdapter extends ListAdapter<Task, ChildTaskViewHolder> {
     }
 
     @Override
-    public void onViewDetachedFromWindow(@NonNull ChildTaskViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull ParentTaskViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         setAnimationFadeOut(holder.itemView);
         holder.clearAnimation();
@@ -93,9 +78,8 @@ public class ChildTasksAdapter extends ListAdapter<Task, ChildTaskViewHolder> {
 
     private void setAnimationFadeIn(View viewToAnimate, int position)
     {
-        if (position > lastPosition)
-        {
-            Animation animation = AnimationUtils.loadAnimation(childActivity, android.R.anim.fade_in);
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(parentActivity, android.R.anim.fade_in);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
@@ -103,7 +87,7 @@ public class ChildTasksAdapter extends ListAdapter<Task, ChildTaskViewHolder> {
 
     private void setAnimationFadeOut(View viewToAnimate)
     {
-        Animation animation = AnimationUtils.loadAnimation(childActivity, android.R.anim.fade_out);
+        Animation animation = AnimationUtils.loadAnimation(parentActivity, android.R.anim.fade_out);
         viewToAnimate.startAnimation(animation);
     }
 

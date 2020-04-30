@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.AddTaskForm">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp">
+
+            <EditText
+                android:id="@+id/etTaskName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="60"
+                android:maxLines="1"
+                android:hint="Task's Name"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Select task's type :"
+                android:textSize="18dp"
+                android:textAlignment="gravity"
+                />
+
+            <Spinner
+                android:id="@+id/spTaskType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownWidth="wrap_content"
+                android:layout_marginTop="25dp"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Select task's duration :"
+                android:textSize="18dp"
+                android:textAlignment="gravity"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="25dp"
+                android:layout_gravity="center"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/etTimeValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:inputType="number"
+                    />
+
+                <Spinner
+                    android:id="@+id/spTimeUnit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:dropDownWidth="wrap_content"
+                    android:layout_weight="1"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Select task's begin time :"
+                android:textSize="18dp"
+                android:textAlignment="gravity"
+                />
+
+            <TimePicker
+                android:id="@+id/tpTaskTimeBegin"
+                android:layout_width="match_parent"
+                android:layout_height="175dp"
+                android:layout_marginTop="25dp"
+                android:timePickerMode="spinner"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="Select task's begin date :"
+                android:textSize="18dp"
+                />
+
+            <DatePicker
+                android:id="@+id/dpDateBegin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:datePickerMode="calendar"
+                android:layout_marginTop="25dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Define task's recurrence and reminders :"
+                android:textSize="18dp"
+                />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcTaskRecurrence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="25dp"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="25dp"
+                    android:animateLayoutChanges="true">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:labelFor="@id/cbHaveRecurrence"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="Define recurrence of the Task"
+                            android:textSize="16dp"
+                            android:gravity="center"
+                            />
+
+                        <CheckBox
+                            android:id="@+id/cbHaveRecurrence"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llTaskRecurrence"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_margin="10dp"
+                        android:visibility="gone"
+                        android:weightSum="1"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.75"
+                            android:textAlignment="center"
+                            android:text="Repeat every : "/>
+
+                        <Spinner
+                            android:id="@+id/spTaskRepeatTU"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:dropDownWidth="wrap_content"
+                            android:layout_weight="0.25"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="25dp"
+                app:strokeColor="@color/stroke_color"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="25dp"
+                    android:animateLayoutChanges="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        >
+
+                        <TextView
+                            android:labelFor="@id/cbHaveReminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="Define reminders for the Task"
+                            android:textSize="16dp"
+                            android:gravity="center"
+                            />
+
+                        <CheckBox
+                            android:id="@+id/cbHaveReminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/llTaskReminder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center">
+
+                            <TextView
+                                android:labelFor="@id/etTaskCountReminder"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text="Remind CHILD_NAME"
+                                android:textSize="16dp"
+                                android:gravity="left"
+                                />
+
+                            <EditText
+                                android:id="@+id/etTaskCountReminder"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:inputType="number"
+                                android:gravity="center"
+                                android:hint="1, 2, 3 ?"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="10dp"/>
+
+                            <TextView
+                                android:labelFor="@id/etTaskCountReminder"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text="times every"
+                                android:textSize="16dp"
+                                android:gravity="center"
+                                />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp">
+                            <EditText
+                                android:id="@+id/etTaskReminderValue"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:inputType="number"
+                                />
+
+                            <Spinner
+                                android:id="@+id/spTaskReminderTU"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:dropDownWidth="wrap_content"
+                                android:layout_weight="0.75"
+                                />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center"
+                            android:gravity="center">
+
+                            <Spinner
+                                android:id="@+id/spTaskReminderBeAf"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:dropDownWidth="wrap_content"
+                                android:layout_weight="0.5"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="0.5"
+                                android:gravity="center"
+                                android:textSize="18dp"
+                                android:text="Task's start"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="If you have finished to plan CHILD_NAME 's task"
+                android:textSize="18dp"
+                android:textAlignment="center"
+                />
+
+            <Button
+                android:id="@+id/btAddTasks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="50dp"
+                android:layout_gravity="center"
+                android:text="Add new Task for CHILD_NAME" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

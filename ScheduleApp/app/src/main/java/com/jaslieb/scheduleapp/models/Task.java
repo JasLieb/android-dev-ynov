@@ -13,6 +13,8 @@ public class Task {
     public TimeUnitEnum recurrence;
     public Reminder reminder;
 
+    public boolean parentWarned;
+
     public Task() {}
 
     public Task(
@@ -22,7 +24,8 @@ public class Task {
         long duration,
         TaskTypeEnum type,
         TimeUnitEnum recurrence,
-        Reminder reminder
+        Reminder reminder,
+        boolean parentWarned
     ) {
         this.name = name;
         this.childrenId = childrenId;
@@ -31,5 +34,10 @@ public class Task {
         this.type = type;
         this.recurrence = recurrence;
         this.reminder = reminder;
+        this.parentWarned = parentWarned;
+    }
+
+    public static Task makeDefault() {
+        return new Task();
     }
 }

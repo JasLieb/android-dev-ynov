@@ -21,7 +21,7 @@ import android.widget.TimePicker;
 
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.actors.ParentActor;
-import com.jaslieb.scheduleapp.models.Reminder;
+import com.jaslieb.scheduleapp.models.tasks.Reminder;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.utils.DateUtil;

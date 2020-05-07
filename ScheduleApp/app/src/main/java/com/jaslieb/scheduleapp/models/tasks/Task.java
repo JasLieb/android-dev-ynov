@@ -1,4 +1,4 @@
-package com.jaslieb.scheduleapp.models;
+package com.jaslieb.scheduleapp.models.tasks;
 
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;

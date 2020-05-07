@@ -1,4 +1,4 @@
-package com.jaslieb.scheduleapp.models;
+package com.jaslieb.scheduleapp.models.tasks;
 
 public class Reminder {
     public boolean isTriggered;

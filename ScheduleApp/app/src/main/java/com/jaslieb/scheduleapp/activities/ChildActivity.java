@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.adapters.tasks.ChildTasksAdapter;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.services.AlarmService;
 import com.jaslieb.scheduleapp.states.ChildState;
 

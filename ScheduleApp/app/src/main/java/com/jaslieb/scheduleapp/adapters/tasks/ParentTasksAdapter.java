@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.activities.ParentActivity;
 import com.jaslieb.scheduleapp.adapters.tasks.viewHolders.ParentTaskViewHolder;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;

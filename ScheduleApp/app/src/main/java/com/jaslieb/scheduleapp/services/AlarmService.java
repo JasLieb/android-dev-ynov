@@ -14,8 +14,8 @@ import androidx.annotation.Nullable;
 
 import com.jaslieb.scheduleapp.actors.ChildActor;
 import com.jaslieb.scheduleapp.jobs.NotificationJob;
-import com.jaslieb.scheduleapp.models.Reminder;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Reminder;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.states.ChildState;
 import com.jaslieb.scheduleapp.utils.DateUtil;

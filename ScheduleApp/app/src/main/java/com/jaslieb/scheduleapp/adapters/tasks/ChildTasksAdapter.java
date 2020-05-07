@@ -5,23 +5,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.activities.ChildActivity;
 import com.jaslieb.scheduleapp.adapters.tasks.viewHolders.ChildTaskViewHolder;
-import com.jaslieb.scheduleapp.models.Reminder;
-import com.jaslieb.scheduleapp.models.Task;
-import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
-import com.jaslieb.scheduleapp.utils.DateUtil;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;

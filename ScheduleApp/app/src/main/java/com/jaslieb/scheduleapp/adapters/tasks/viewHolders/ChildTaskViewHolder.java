@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.activities.ChildActivity;
-import com.jaslieb.scheduleapp.models.Reminder;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Reminder;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 

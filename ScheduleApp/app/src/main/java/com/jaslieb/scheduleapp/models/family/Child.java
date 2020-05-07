@@ -5,9 +5,9 @@ import com.jaslieb.scheduleapp.models.tasks.Task;
 import java.util.ArrayList;
 
 public class Child {
-    String name;
-    String password;
-    ArrayList<Task> tasks;
+    public String name;
+    public String password;
+    public ArrayList<Task> tasks;
 
     public Child() {}
 

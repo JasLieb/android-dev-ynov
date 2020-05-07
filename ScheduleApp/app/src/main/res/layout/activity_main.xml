@@ -37,31 +37,45 @@
                 android:padding="25dp"
                 android:backgroundTint="@color/green"
                 android:text="Permissions settings"
-                android:textSize="20sp"/>
+                android:textSize="22sp"/>
 
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/llAppBase"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_marginLeft="75dp"
+            android:layout_marginRight="75dp"
+            android:layout_marginBottom="100dp"
             android:gravity="center">
+            <EditText
+                android:id="@+id/etFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="First name"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/etUserPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:layout_marginTop="50dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:textSize="22sp" />
 
             <Button
-                android:id="@+id/btChildPanel"
+                android:id="@+id/btLogSubmit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="25dp"
-                android:text="John's plan"
-                android:textSize="20sp"/>
-
-            <Button
-                android:id="@+id/btParentPanel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:padding="25dp"
-                android:text="Parent side"
-                android:textSize="20sp"/>
+                android:layout_marginTop="50dp"
+                android:padding="20dp"
+                android:textSize="20sp"
+                android:text="Login"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

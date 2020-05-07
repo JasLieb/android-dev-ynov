@@ -16,6 +16,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:animateLayoutChanges="true">
 
+        <TextView
+            android:id="@+id/tvParentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hello"
+            android:gravity="center"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:textSize="26sp"/>
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -29,12 +39,13 @@
                 android:padding="20dp">
 
                 <TextView
+                    android:id="@+id/tvAddNewTask"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="0.9"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Add a new Task for CHILD_NAME"
+                    android:text="Add a new Task for"
                     android:textSize="20sp"/>
 
                 <Button
@@ -77,11 +88,12 @@
                     android:padding="20dp">
 
                     <TextView
+                        android:id="@+id/tvShowTasks"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="0.9"
                         android:gravity="center"
-                        android:text="See all tasks for CHILD_NAME"
+                        android:text="See all tasks for"
                         android:textSize="20sp"/>
 
                     <Button

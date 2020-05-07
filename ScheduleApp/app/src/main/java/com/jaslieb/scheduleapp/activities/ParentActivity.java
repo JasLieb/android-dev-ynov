@@ -5,16 +5,21 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jaslieb.scheduleapp.R;
-import com.jaslieb.scheduleapp.actors.ParentActor;
+import com.jaslieb.scheduleapp.actors.FamilyActor;
 import com.jaslieb.scheduleapp.adapters.tasks.ParentTasksAdapter;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.services.AlarmService;
 import com.jaslieb.scheduleapp.states.ParentState;
+
+import java.util.List;
+import java.util.Map;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -30,6 +35,26 @@ public class ParentActivity extends AppCompatActivity {
             @Override
             public void onNext(@NonNull ParentState parentState) {
                 tasksAdapter.setListItem(parentState.tasks);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {}
+
+            @Override
+            public void onComplete() {}
+        };
+
+    private DisposableObserver<Map<String, List<Task>>> childrenTasksObserver =
+        new DisposableObserver<Map<String, List<Task>>>() {
+            @Override
+            public void onNext(@NonNull Map<String, List<Task>> childrenTaskMap) {
+                for (Map.Entry<String, List<Task>> entry : childrenTaskMap.entrySet()) {
+                    TextView tvAddNewTask = findViewById(R.id.tvAddNewTask);
+                    TextView tvAShowTasks = findViewById(R.id.tvShowTasks);
+                    tvAddNewTask.setText("Add a new Task for " + entry.getKey());
+                    tvAShowTasks.setText("See all tasks for  " + entry.getKey());
+                    tasksAdapter.setListItem(entry.getValue());
+                }
             }
 
             @Override
@@ -77,11 +102,18 @@ public class ParentActivity extends AppCompatActivity {
             );
         });
 
-        ParentActor service = ParentActor.getInstance();
-        service
-            .parentStateBehavior
-            .subscribe(childStateObserver);
-        disposable.add(childStateObserver);
+        Intent intent = getIntent();
+        String parentName = intent.getStringExtra("name");
+        TextView tvParentName = findViewById(R.id.tvParentName);
+        tvParentName.setText("Hello " + parentName + " !");
+
+        String lastName = intent.getStringExtra("lastName");
+
+        FamilyActor familyActor = FamilyActor.getInstance();
+        familyActor.getChildrenTasks(lastName);
+        familyActor.childrenMappedTasksBehavior.subscribe(childrenTasksObserver);
+
+        disposable.add(childrenTasksObserver);
     }
 
 

@@ -6,12 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".activities.ChildActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/lvTasks"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusable="true"
-        android:clickable="true"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <TextView
+            android:id="@+id/tvChildName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hello"
+            android:gravity="center"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
+            android:textSize="26sp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lvTasks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:clickable="true"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

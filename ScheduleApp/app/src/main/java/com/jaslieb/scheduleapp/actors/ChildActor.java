@@ -28,7 +28,9 @@ public class ChildActor{
 
     private ChildActor() {
         childStateBehavior = BehaviorSubject.createDefault(ChildState.Default);
+    }
 
+    public void setChildName(String name) {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         tasks = database.collection("tasks");
         tasks.addSnapshotListener((value, e) -> {
@@ -43,7 +45,7 @@ public class ChildActor{
                 new ChildState(
                     taskList
                         .stream()
-                        .filter(task -> "JohnId".equals(task.childrenId))
+                        .filter(task -> name.equals(task.childrenId))
                         .collect(Collectors.toList())
                 )
             );

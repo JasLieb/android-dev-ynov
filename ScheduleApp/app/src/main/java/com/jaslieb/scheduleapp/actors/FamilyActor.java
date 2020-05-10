@@ -8,10 +8,12 @@ import com.jaslieb.scheduleapp.models.family.Family;
 import com.jaslieb.scheduleapp.models.family.Parent;
 import com.jaslieb.scheduleapp.models.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
@@ -25,6 +27,8 @@ public class FamilyActor {
 
     public BehaviorSubject<String> resultBehavior;
     public BehaviorSubject<Map<String, List<Task>>> childrenMappedTasksBehavior;
+    public BehaviorSubject<List<String>> childrenNamesBehavior;
+
 
     private FirebaseFirestore database;
     private CollectionReference families;
@@ -32,6 +36,7 @@ public class FamilyActor {
     private FamilyActor() {
         resultBehavior = BehaviorSubject.createDefault("not connected");
         childrenMappedTasksBehavior = BehaviorSubject.createDefault( new HashMap<>() );
+        childrenNamesBehavior = BehaviorSubject.createDefault(new ArrayList<>());
         database = FirebaseFirestore.getInstance();
         families = database.collection("families");
     }
@@ -77,6 +82,13 @@ public class FamilyActor {
                                 this.childrenMappedTasksBehavior.onNext(map);
                             });
                     }
+                    this.childrenNamesBehavior.onNext(
+                        family.children.stream()
+                            .map(child -> child.name)
+                            .collect(Collectors.toList()
+                        )
+                    );
+                    break;
                 }
             }
         });

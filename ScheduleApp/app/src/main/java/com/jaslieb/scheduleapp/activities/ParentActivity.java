@@ -2,9 +2,6 @@ package com.jaslieb.scheduleapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,10 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.actors.FamilyActor;
-import com.jaslieb.scheduleapp.adapters.tasks.ParentTasksAdapter;
+import com.jaslieb.scheduleapp.adapters.children.ChildrenAdapter;
 import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.services.AlarmService;
-import com.jaslieb.scheduleapp.states.ParentState;
 
 import java.util.List;
 import java.util.Map;
@@ -27,34 +23,14 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 
 public class ParentActivity extends AppCompatActivity {
 
-    private ParentTasksAdapter tasksAdapter;
+    private ChildrenAdapter tasksAdapter;
     private CompositeDisposable disposable = new CompositeDisposable();
-
-    private DisposableObserver<ParentState> childStateObserver =
-        new DisposableObserver<ParentState>() {
-            @Override
-            public void onNext(@NonNull ParentState parentState) {
-                tasksAdapter.setListItem(parentState.tasks);
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {}
-
-            @Override
-            public void onComplete() {}
-        };
 
     private DisposableObserver<Map<String, List<Task>>> childrenTasksObserver =
         new DisposableObserver<Map<String, List<Task>>>() {
             @Override
             public void onNext(@NonNull Map<String, List<Task>> childrenTaskMap) {
-                for (Map.Entry<String, List<Task>> entry : childrenTaskMap.entrySet()) {
-                    TextView tvAddNewTask = findViewById(R.id.tvAddNewTask);
-                    TextView tvAShowTasks = findViewById(R.id.tvShowTasks);
-                    tvAddNewTask.setText("Add a new Task for " + entry.getKey());
-                    tvAShowTasks.setText("See all tasks for  " + entry.getKey());
-                    tasksAdapter.setListItem(entry.getValue());
-                }
+                tasksAdapter.setListItem(childrenTaskMap);
             }
 
             @Override
@@ -63,8 +39,6 @@ public class ParentActivity extends AppCompatActivity {
             @Override
             public void onComplete() {}
         };
-
-    private LinearLayout llAddTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,30 +51,11 @@ public class ParentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent);
 
-        llAddTask = findViewById(R.id.llAddTask);
-
-        tasksAdapter = new ParentTasksAdapter(this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        RecyclerView taskList = findViewById(R.id.lvTasks);
-
-        taskList.setLayoutManager(layoutManager);
-        taskList.setAdapter(tasksAdapter);
-
-        Button btShowAddTask = findViewById(R.id.btShowAddTask);
-        btShowAddTask.setOnClickListener(v -> {
-            llAddTask.setVisibility(
-                    llAddTask.getVisibility() == View.VISIBLE
-                    ? View.GONE
-                    : View.VISIBLE
-            );
-        });
-
-        Button btShowTaskChild = findViewById(R.id.btShowTaskChild);
-        btShowTaskChild.setOnClickListener(v -> {
-            taskList.setVisibility(
-                taskList.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE
-            );
-        });
+        RecyclerView rvChildren = findViewById(R.id.rvChildren);
+        tasksAdapter = new ChildrenAdapter(this);
+        rvChildren.setLayoutManager(layoutManager);
+        rvChildren.setAdapter(tasksAdapter);
 
         Intent intent = getIntent();
         String parentName = intent.getStringExtra("name");

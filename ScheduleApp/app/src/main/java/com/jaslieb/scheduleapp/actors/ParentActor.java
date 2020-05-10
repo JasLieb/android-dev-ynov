@@ -39,6 +39,7 @@ public class ParentActor {
     }
 
     public void addTask(
+            String childName,
             String name,
             long beginTime,
             long duration,
@@ -49,7 +50,7 @@ public class ParentActor {
         tasks.add(
             new Task(
                 name,
-                "JohnId",
+                childName,
                 beginTime,
                 duration,
                 type,

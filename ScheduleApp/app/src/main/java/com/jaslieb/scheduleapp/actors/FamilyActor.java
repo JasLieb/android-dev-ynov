@@ -78,7 +78,7 @@ public class FamilyActor {
                 if(family != null && family.name.equals(lastName)) {
                     for (Child child: family.children) {
                         database.collection("tasks")
-                            .whereEqualTo("childrenId", child.name)
+                            .whereEqualTo("childName", child.name)
                             .addSnapshotListener((queryDocumentSnapshots, e) -> {
                                 List<Task> taskList = Objects.requireNonNull(queryDocumentSnapshots).toObjects(Task.class);
                                 map.put(child.name, taskList);
@@ -97,14 +97,14 @@ public class FamilyActor {
         });
     }
 
-    public void warnParents(String childrenId, String taskName) {
+    public void warnParents(String childName, String taskName) {
         this.families.get().addOnCompleteListener(families -> {
             for (DocumentSnapshot doc: families.getResult()) {
                 Family family = doc.toObject(Family.class);
                 if (
                     family != null
                     && family.children.stream().anyMatch(
-                        child -> child.name.equals(childrenId)
+                        child -> child.name.equals(childName)
                     )
                 ) {
                     for (Parent parent : family.parents) {

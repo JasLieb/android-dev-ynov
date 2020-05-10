@@ -45,7 +45,7 @@ public class ChildActor{
                 new ChildState(
                     taskList
                         .stream()
-                        .filter(task -> name.equals(task.childrenId))
+                        .filter(task -> name.equals(task.childName))
                         .collect(Collectors.toList())
                 )
             );
@@ -103,7 +103,7 @@ public class ChildActor{
     }
 
     public void warnParentForTask(Task task) {
-        familyActor.warnParents(task.childrenId, task.name);
+        familyActor.warnParents(task.childName, task.name);
         updateParentWarned(task.name);
     }
 

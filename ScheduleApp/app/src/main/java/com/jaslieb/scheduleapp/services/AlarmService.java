@@ -80,7 +80,7 @@ public class AlarmService extends Service {
             Log.d("SERVICE", "CURRENT TIME " + DateUtil.formatToDateString(System.currentTimeMillis()));
             PersistableBundle extras = new PersistableBundle();
             extras.putString("task_name", task.name);
-            extras.putString("child_name", task.childrenId);
+            extras.putString("child_name", task.childName);
 
             jobScheduler.schedule(
                 new JobInfo.Builder(NotificationId, new ComponentName(context, NotificationJob.class))

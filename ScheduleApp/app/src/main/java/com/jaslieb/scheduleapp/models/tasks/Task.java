@@ -5,7 +5,7 @@ import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 
 public class Task {
     public String name;
-    public String childrenId;
+    public String childName;
     public long begin;
     public long duration;
 
@@ -19,7 +19,7 @@ public class Task {
 
     public Task(
         String name,
-        String childrenId,
+        String childName,
         long begin,
         long duration,
         TaskTypeEnum type,
@@ -28,7 +28,7 @@ public class Task {
         boolean parentWarned
     ) {
         this.name = name;
-        this.childrenId = childrenId;
+        this.childName = childName;
         this.begin = begin;
         this.duration = duration;
         this.type = type;

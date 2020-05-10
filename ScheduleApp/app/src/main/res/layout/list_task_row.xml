@@ -81,13 +81,28 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btExpandTaskDetails"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Details"
-                android:drawableEnd="@drawable/ic_expand_more_black_24dp"/>
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center">
+                <ImageView
+                    android:id="@+id/ivIsLate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_assignment_late_red_24dp"
+                    android:contentDescription="Task in late" />
+
+                <Button
+                    android:id="@+id/btExpandTaskDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="Details"
+                    android:drawableEnd="@drawable/ic_expand_more_black_24dp"/>
+            </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/llTaskBig"

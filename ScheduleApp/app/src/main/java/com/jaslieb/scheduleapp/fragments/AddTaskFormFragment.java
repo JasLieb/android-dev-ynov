@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import android.widget.TimePicker;
 
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.actors.ParentActor;
-import com.jaslieb.scheduleapp.models.Reminder;
+import com.jaslieb.scheduleapp.models.tasks.Reminder;
 import com.jaslieb.scheduleapp.models.enums.TaskTypeEnum;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.utils.DateUtil;
@@ -32,9 +33,10 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class AddTaskForm extends Fragment {
+public class AddTaskFormFragment extends Fragment {
 
     private ParentActor parentActor;
+    private String childName;
 
     private EditText etTaskName;
 
@@ -139,13 +141,13 @@ public class AddTaskForm extends Fragment {
         }
 
         if(taskName.length() > 0) {
-            parentActor.addTask(taskName, beginTime, duration, type, recurrence, reminder);
+            parentActor.addTask(childName, taskName, beginTime, duration, type, recurrence, reminder);
         }
 
         lostFocusOnEditText();
     };
 
-    public AddTaskForm() { }
+    public AddTaskFormFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -155,6 +157,9 @@ public class AddTaskForm extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.childName = getArguments().getString("childName");
+        Log.d("ADD TASK FRAGMENT", "CHILD NAME : " + childName);
+
         View view =  inflater.inflate(R.layout.fragment_add_task_form, container, false);
         etTaskName = view.findViewById(R.id.etTaskName);
 

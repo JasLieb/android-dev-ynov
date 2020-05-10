@@ -41,6 +41,7 @@ public class NotificationJob extends JobService {
         }
 
         String taskName = params.getExtras().getString("task_name");
+        String childName = params.getExtras().getString("child_name");
         Log.d("ALARM NOTIFICATION", "TASK NAME : " + taskName);
         assert taskName != null;
 
@@ -49,6 +50,7 @@ public class NotificationJob extends JobService {
             makeNotification(
                 context,
                 channelId,
+                childName,
                 taskName
             )
         );
@@ -64,6 +66,7 @@ public class NotificationJob extends JobService {
     private Notification makeNotification(
             Context context,
             String channelId,
+            String childName,
             String taskName
     ) {
         Intent alarmReceiverIntent = new Intent(context, AlarmActionReceiver.class);
@@ -82,7 +85,7 @@ public class NotificationJob extends JobService {
                         .getBroadcast(
                             context,
                             counter,
-                            intentWithAction(alarmReceiverIntent, counter, taskName, true),
+                            intentWithAction(alarmReceiverIntent, counter, childName, taskName, true),
                             PendingIntent.FLAG_ONE_SHOT
                         )
                 )
@@ -92,7 +95,7 @@ public class NotificationJob extends JobService {
                     PendingIntent.getBroadcast(
                         context,
                         counter,
-                        intentWithAction(alarmReceiverIntent, counter, taskName),
+                        intentWithAction(alarmReceiverIntent, counter, childName, taskName),
                         PendingIntent.FLAG_ONE_SHOT
                     )
                 );
@@ -100,11 +103,11 @@ public class NotificationJob extends JobService {
         return build.build();
     }
 
-    private Intent intentWithAction(Intent intent, int notificationId, String taskName ) {
-        return intentWithAction(intent, notificationId, taskName, false);
+    private Intent intentWithAction(Intent intent, int notificationId, String childName, String taskName ) {
+        return intentWithAction(intent, notificationId, childName, taskName, false);
     }
 
-    private Intent intentWithAction(Intent intent, int notificationId, String taskName, boolean isDone) {
+    private Intent intentWithAction(Intent intent, int notificationId, String childName, String taskName, boolean isDone) {
         intent.setAction(
             isDone
                 ? "done"
@@ -112,6 +115,7 @@ public class NotificationJob extends JobService {
         );
 
         intent.putExtra("task_name", taskName);
+        intent.putExtra("child_name", childName);
         intent.putExtra("notification_id", notificationId);
         return intent;
     }

@@ -29,6 +29,7 @@ public class AlarmActionReceiver extends BroadcastReceiver {
         assert notificationManager != null;
 
         String taskName = intent.getStringExtra("task_name");
+        String childName = intent.getStringExtra("child_name");
         notificationManager.cancel(intent.getIntExtra("notification_id", -1));
         ChildActor childActor = ChildActor.getInstance();
 
@@ -36,7 +37,7 @@ public class AlarmActionReceiver extends BroadcastReceiver {
             childActor.updateTaskAsDone(taskName);
         }
         else {
-            childActor.warnParentForTask(taskName);
+            childActor.warnParentForTask(childName, taskName);
         }
     }
 

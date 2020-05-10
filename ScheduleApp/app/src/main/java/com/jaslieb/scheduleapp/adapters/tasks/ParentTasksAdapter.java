@@ -1,5 +1,6 @@
 package com.jaslieb.scheduleapp.adapters.tasks;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +14,13 @@ import androidx.recyclerview.widget.ListAdapter;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.activities.ParentActivity;
 import com.jaslieb.scheduleapp.adapters.tasks.viewHolders.ParentTaskViewHolder;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ParentTasksAdapter extends ListAdapter<Task, ParentTaskViewHolder> {
-    private ParentActivity parentActivity;
+    private Activity parentActivity;
     private List<Task> tasks;
     private int lastPosition = -1;
 
@@ -35,7 +36,7 @@ public class ParentTasksAdapter extends ListAdapter<Task, ParentTaskViewHolder> 
             }
         };
 
-    public ParentTasksAdapter(ParentActivity parentActivity) {
+    public ParentTasksAdapter(Activity parentActivity) {
         super(DIFF_CALLBACK);
         this.parentActivity = parentActivity;
         tasks = new ArrayList<>();

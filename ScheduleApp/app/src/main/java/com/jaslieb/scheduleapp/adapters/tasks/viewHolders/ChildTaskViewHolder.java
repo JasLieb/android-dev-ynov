@@ -2,6 +2,7 @@ package com.jaslieb.scheduleapp.adapters.tasks.viewHolders;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -11,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 import com.jaslieb.scheduleapp.R;
 import com.jaslieb.scheduleapp.activities.ChildActivity;
-import com.jaslieb.scheduleapp.models.Reminder;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Reminder;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.utils.DateUtil;
 
@@ -40,6 +41,9 @@ public class ChildTaskViewHolder extends RecyclerView.ViewHolder {
         TextView tvTaskDuration = llContainer.findViewById(R.id.tvTaskDuration);
         TextView tvTaskDurationBig = llContainer.findViewById(R.id.tvTaskDurationBig);
         TextView tvTaskDateBeginBig = llContainer.findViewById(R.id.tvTaskDateBeginBig);
+
+        ImageView ivIsLate = llContainer.findViewById(R.id.ivIsLate);
+        ivIsLate.setVisibility(task.parentWarned ? View.VISIBLE : View.GONE);
 
         TextView tvTaskRecurrenceReminder = llContainer.findViewById(R.id.tvTaskRecurrenceReminder);
 

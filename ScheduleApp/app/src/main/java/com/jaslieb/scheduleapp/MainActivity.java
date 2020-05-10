@@ -6,9 +6,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,32 +20,85 @@ import androidx.core.content.ContextCompat;
 
 import com.jaslieb.scheduleapp.activities.ChildActivity;
 import com.jaslieb.scheduleapp.activities.ParentActivity;
+import com.jaslieb.scheduleapp.actors.FamilyActor;
+
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_REQUEST_SEND_SMS = 1;
 
+    private FamilyActor familyActor;
+
+    private CompositeDisposable disposable = new CompositeDisposable();
+
+    private DisposableObserver<String> resultObserver =
+        new DisposableObserver<String>() {
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull String result) {
+                String[] resultSplinted = result.split(" ");
+                Intent intent;
+                switch (resultSplinted[0]) {
+                    case "notConnected":
+                        Toast.makeText(getApplicationContext(), "Not connected :(", Toast.LENGTH_LONG).show();
+                        break;
+                    case "parent":
+                        intent = new Intent( getApplicationContext(), ParentActivity.class);
+                        intent.putExtra("name", resultSplinted[1]);
+                        intent.putExtra("lastName", etLastName.getText().toString());
+                        startActivity(intent);
+                        break;
+                    case "child":
+                        intent = new Intent( getApplicationContext(), ChildActivity.class);
+                        intent.putExtra("name", resultSplinted[1]);
+                        startActivity(intent);
+                        break;
+                }
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {}
+
+            @Override
+            public void onComplete() {}
+        };
+
+
     private LinearLayout llPermissions;
-    private Button btChildPanel;
-    private Button btParentPanel;
+
+    private EditText etLastName;
+    private EditText etUserPassword;
+    private Button btLogSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        familyActor = FamilyActor.getInstance();
+
+        familyActor.resultBehavior.skip(1).subscribe(resultObserver);
+        disposable.add(resultObserver);
+
         llPermissions = findViewById(R.id.llPermissions);
         Button btPermissions = findViewById(R.id.btPermissions);
-        btPermissions.setOnClickListener(v -> {
-            openAppSettings();
-        });
+        btPermissions.setOnClickListener(v -> openAppSettings());
 
-        btChildPanel = findViewById(R.id.btChildPanel);
-        btParentPanel = findViewById(R.id.btParentPanel);
+        etLastName = findViewById(R.id.etFirstName);
+        etUserPassword = findViewById(R.id.etUserPassword);
+
+        btLogSubmit = findViewById(R.id.btLogSubmit);
 
         setButtonsEnabled(
             checkIfPermissionsAllowed()
         );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.disposable.dispose();
     }
 
     @Override
@@ -85,8 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setButtonsEnabled(boolean value) {
-        btChildPanel.setEnabled(value);
-        btParentPanel.setEnabled(value);
+        btLogSubmit.setEnabled(value);
 
         llPermissions.setVisibility(
             !value
@@ -95,13 +150,19 @@ public class MainActivity extends AppCompatActivity {
         );
 
         if (value) {
-            btChildPanel.setOnClickListener(v -> startActivity(
-                new Intent(getBaseContext(), ChildActivity.class)
-            ));
+            LinearLayout llAppBase = findViewById(R.id.llAppBase);
+            llAppBase.setOnClickListener(v -> {
+                etLastName.clearFocus();
+                etUserPassword.clearFocus();
+            });
 
-            btParentPanel.setOnClickListener(v -> startActivity(
-                new Intent(getBaseContext(), ParentActivity.class)
-            ));
+            btLogSubmit.setOnClickListener(v -> {
+                String firstName = etLastName.getText().toString();
+                String password = etUserPassword.getText().toString();
+                familyActor.checkPassword(firstName, password);
+                etLastName.clearFocus();
+                etUserPassword.clearFocus();
+            });
         }
     }
 }

@@ -1,12 +1,10 @@
 package com.jaslieb.scheduleapp.actors;
 
-import android.telephony.SmsManager;
-
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 import com.jaslieb.scheduleapp.models.enums.TimeUnitEnum;
 import com.jaslieb.scheduleapp.states.ChildState;
 
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class ChildActor{
+    private FamilyActor familyActor;
 
     private static ChildActor actor = null;
     public static ChildActor getInstance() {
@@ -27,8 +26,11 @@ public class ChildActor{
     public BehaviorSubject<ChildState> childStateBehavior;
 
     private ChildActor() {
+        familyActor = FamilyActor.getInstance();
         childStateBehavior = BehaviorSubject.createDefault(ChildState.Default);
+    }
 
+    public void setChildName(String name) {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         tasks = database.collection("tasks");
         tasks.addSnapshotListener((value, e) -> {
@@ -43,7 +45,7 @@ public class ChildActor{
                 new ChildState(
                     taskList
                         .stream()
-                        .filter(task -> "JohnId".equals(task.childrenId))
+                        .filter(task -> name.equals(task.childName))
                         .collect(Collectors.toList())
                 )
             );
@@ -100,20 +102,14 @@ public class ChildActor{
             });
     }
 
-    public void warnParentForTask(String name) {
-        sendSMS(name);
-        updateParentWarned(name);
+    public void warnParentForTask(Task task) {
+        familyActor.warnParents(task.childName, task.name);
+        updateParentWarned(task.name);
     }
 
-    private void sendSMS(String name) {
-        SmsManager manager = SmsManager.getDefault();
-        manager.sendTextMessage(
-            "0609580401",
-            null,
-            name + " will not be finished in time",
-            null,
-            null
-        );
+    public void warnParentForTask(String childName, String taskName) {
+        familyActor.warnParents(childName, taskName);
+        updateParentWarned(taskName);
     }
 
     private void updateParentWarned(String name) {

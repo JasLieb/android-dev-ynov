@@ -1,6 +1,6 @@
 package com.jaslieb.scheduleapp.states;
 
-import com.jaslieb.scheduleapp.models.Task;
+import com.jaslieb.scheduleapp.models.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;

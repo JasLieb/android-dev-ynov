@@ -1,7 +1,5 @@
 package com.jaslieb.scheduleapp.actors;
 
-import android.telephony.SmsManager;
-
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class ChildActor{
+    private FamilyActor familyActor;
 
     private static ChildActor actor = null;
     public static ChildActor getInstance() {
@@ -27,6 +26,7 @@ public class ChildActor{
     public BehaviorSubject<ChildState> childStateBehavior;
 
     private ChildActor() {
+        familyActor = FamilyActor.getInstance();
         childStateBehavior = BehaviorSubject.createDefault(ChildState.Default);
     }
 
@@ -102,20 +102,14 @@ public class ChildActor{
             });
     }
 
-    public void warnParentForTask(String name) {
-        sendSMS(name);
-        updateParentWarned(name);
+    public void warnParentForTask(Task task) {
+        familyActor.warnParents(task.childrenId, task.name);
+        updateParentWarned(task.name);
     }
 
-    private void sendSMS(String name) {
-        SmsManager manager = SmsManager.getDefault();
-        manager.sendTextMessage(
-            "0609580401",
-            null,
-            name + " will not be finished in time",
-            null,
-            null
-        );
+    public void warnParentForTask(String childName, String taskName) {
+        familyActor.warnParents(childName, taskName);
+        updateParentWarned(taskName);
     }
 
     private void updateParentWarned(String name) {

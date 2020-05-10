@@ -98,7 +98,9 @@ public class ChildActivity extends AppCompatActivity {
     }
 
     public void warmParentForTask(Task task) {
-        childActor.warnParentForTask(task.name);
+        if(!task.parentWarned) {
+            childActor.warnParentForTask(task);
+        }
     }
 
     public void updateTaskAsDone(String name) {

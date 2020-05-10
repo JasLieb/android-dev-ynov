@@ -1,5 +1,7 @@
 package com.jaslieb.scheduleapp.actors;
 
+import android.telephony.SmsManager;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,6 +30,7 @@ public class FamilyActor {
     public BehaviorSubject<String> resultBehavior;
     public BehaviorSubject<Map<String, List<Task>>> childrenMappedTasksBehavior;
     public BehaviorSubject<List<String>> childrenNamesBehavior;
+    public BehaviorSubject<List<String>> parentNumbersBehavior;
 
 
     private FirebaseFirestore database;
@@ -89,6 +92,31 @@ public class FamilyActor {
                         )
                     );
                     break;
+                }
+            }
+        });
+    }
+
+    public void warnParents(String childrenId, String taskName) {
+        this.families.get().addOnCompleteListener(families -> {
+            for (DocumentSnapshot doc: families.getResult()) {
+                Family family = doc.toObject(Family.class);
+                if (
+                    family != null
+                    && family.children.stream().anyMatch(
+                        child -> child.name.equals(childrenId)
+                    )
+                ) {
+                    for (Parent parent : family.parents) {
+                        SmsManager manager = SmsManager.getDefault();
+                        manager.sendTextMessage(
+                            parent.number,
+                            null,
+                            taskName + " will not be finished in time",
+                            null,
+                            null
+                        );
+                    }
                 }
             }
         });

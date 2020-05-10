@@ -73,13 +73,14 @@ public class AlarmService extends Service {
         }
     }
 
-    private void setAlarm(Context context, String taskName, long triggerTime) {
+    private void setAlarm(Context context, Task task, long triggerTime) {
         if (triggerTime > 0 ) {
-            Log.d("SERVICE", "ADD ALARM FOR " + taskName);
+            Log.d("SERVICE", "ADD ALARM FOR " + task.name);
             Log.d("SERVICE", "RING ALARM AT " + DateUtil.formatToDateString(triggerTime));
             Log.d("SERVICE", "CURRENT TIME " + DateUtil.formatToDateString(System.currentTimeMillis()));
             PersistableBundle extras = new PersistableBundle();
-            extras.putString("task_name", taskName);
+            extras.putString("task_name", task.name);
+            extras.putString("child_name", task.childrenId);
 
             jobScheduler.schedule(
                 new JobInfo.Builder(NotificationId, new ComponentName(context, NotificationJob.class))
@@ -101,9 +102,9 @@ public class AlarmService extends Service {
 
         if(triggerTime == -2)  {
             Log.d("SERVICE", "NO REMINDER AND TIME PASS FOR " + task.name);
-            childActor.warnParentForTask(task.name);
+            childActor.warnParentForTask(task);
         } else {
-            setAlarm(context, task.name, triggerTime);
+            setAlarm(context, task, triggerTime);
         }
 
         // TODO
@@ -142,7 +143,7 @@ public class AlarmService extends Service {
                 if(trigger > currentTime) {
                     Log.d("SERVICE", "BEFORE : " +  i + " : TRIGGER AT " + DateUtil.formatToDateString(trigger));
                     Log.d("SERVICE", "WARNING BEFORE BEGIN " + task.name);
-                    setAlarm(context, task.name, trigger);
+                    setAlarm(context, task, trigger);
                 }
             }
         } else {
@@ -158,12 +159,12 @@ public class AlarmService extends Service {
                         && System.currentTimeMillis() > baseTrigger
                     ) {
                         Log.d("SERVICE", "NO TIME ANYMORE FOR " + task.name);
-                        childActor.warnParentForTask(task.name);
+                        childActor.warnParentForTask(task);
                         childActor.removeReminderFor(task);
                         break;
                     }
                     Log.d("SERVICE", "REMINDER AFTER AT " + DateUtil.formatToDateString(trigger));
-                    setAlarm(context, task.name, trigger);
+                    setAlarm(context, task, trigger);
                 }
             }
         }
